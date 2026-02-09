@@ -20,7 +20,7 @@ export default function Button({
       ? "px-4 py-2 bg-blue-600 text-white rounded"
       : variant === "secondary"
       ? "px-4 py-2 bg-gray-300 text-black rounded"
-      : "px-4 py-2 bg-green-600 text-white rounded";
+      : "px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded";
 
   return (
     <button type={type} onClick={onClick} className={className}>
