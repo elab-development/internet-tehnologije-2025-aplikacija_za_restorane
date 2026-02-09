@@ -1,20 +1,28 @@
-import Link from "next/link";
+"use client";
+import Button from "./components/Button";
 
-export default function Home() {
+export default function HomePage() {
   return (
     <main style={{ padding: 24 }}>
-      <h1>Aplikacija za rezervaciju restorana</h1>
+      <h1>Početna strana</h1>
 
-      <p style={{ marginTop: 12 }}>
-        Rezervišite sto u restoranu brzo i jednostavno, uz mogućnost
-        unaprednog naručivanja hrane.
-      </p>
+      <Button
+        variant="primary"
+        onClick={() => alert("Klik sa Home stranice")}
+      >
+        Primary dugme
+      </Button>
 
-      <nav style={{ display: "flex", gap: 16, marginTop: 24 }}>
-        <Link href="/login">Login</Link>
-        <Link href="/contact">Kontakt</Link>
-      </nav>
+      <br /><br />
+
+      <Button
+        variant="secondary"
+        onClick={() => alert("Drugo dugme")}
+      >
+        Secondary dugme
+      </Button>
     </main>
   );
 }
+
 
