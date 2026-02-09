@@ -1,6 +1,8 @@
 "use client";
 
 import { useState } from "react";
+import Button from "../components/Button";
+import Input from "../components/Input";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -15,29 +17,28 @@ export default function LoginPage() {
   }
 
   return (
-    <main style={{ padding: 24 }}>
+    <main style={{ padding: 24, maxWidth: 400 }}>
       <h1>Login</h1>
 
-      <input
+      <Input
         type="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
-        style={{ display: "block", marginTop: 12, padding: 8 }}
       />
 
-      <input
+      <Input
         type="password"
         placeholder="Lozinka"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
-        style={{ display: "block", marginTop: 12, padding: 8 }}
       />
 
-      <button onClick={handleLogin} style={{ marginTop: 16 }}>
-        Prijavi se
-      </button>
+      <div style={{ marginTop: 16 }}>
+        <Button variant="primary" onClick={handleLogin}>
+          Prijavi se
+        </Button>
+      </div>
     </main>
   );
 }
-
