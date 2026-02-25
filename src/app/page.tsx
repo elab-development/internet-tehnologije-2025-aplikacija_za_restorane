@@ -143,9 +143,13 @@ export default function Home() {
 
   const Section = ({ title, data }: { title: string; data: Restaurant[] }) => (
     <section style={{ marginTop: 28 }}>
-      <h2 style={{ fontSize: 22, marginBottom: 12 }}>{title}</h2>
+      <h2 className="text-2xl font-semibold text-zinc-900 mt-10 mb-4">
+  {title}
+</h2>
+      
 
       <div
+      
         style={{
           display: "grid",
           gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
@@ -154,6 +158,7 @@ export default function Home() {
       >
         {data.map((r) => (
           <Card key={r.id} title={r.name} description={r.desc} imageUrl={r.img}>
+           
             <Button
               variant="success"
               onClick={() => {
@@ -170,8 +175,12 @@ export default function Home() {
   );
 
   return (
-    <main style={{ padding: 24, maxWidth: 1200, margin: "0 auto" }}>
-      <h1 style={{ fontSize: 28, marginBottom: 6 }}>Restorani u ponudi</h1>
+    <main className="min-h-screen bg-zinc-50 px-6 py-10">
+  <div className="max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold text-zinc-900">
+  Restorani u ponudi
+</h1>
+      
       <p style={{ color: "#555", marginBottom: 18 }}>
         Izaberi restoran i klikni “Detalji” za više informacija.
       </p>
@@ -227,6 +236,8 @@ export default function Home() {
           </>
         )}
       </Modal>
+        </div>
+
     </main>
   );
 }

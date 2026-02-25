@@ -2,6 +2,21 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
+
+<nav className="bg-white border-b">
+  <div className="max-w-6xl mx-auto px-6 py-4 flex justify-between">
+    <h1 className="font-bold text-lg">Restoran App</h1>
+
+    <div className="flex gap-4">
+      <a href="/" className="hover:text-green-600">Home</a>
+      <a href="/contact" className="hover:text-green-600">Kontakt</a>
+      <a href="/login" className="hover:text-green-600">Login</a>
+    </div>
+  </div>
+</nav>
+
+
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],

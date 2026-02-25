@@ -10,10 +10,14 @@ type ButtonProps = {
 };
 
 export default function Button({
+
+  
+
   children,
   onClick,
   variant = "primary",
   type = "button",
+  
 }: ButtonProps) {
   const className =
     variant === "primary"
@@ -25,7 +29,15 @@ export default function Button({
   return (
     <button type={type} onClick={onClick} className={className}>
       {children}
+      
     </button>
   );
+
+
+
+
+
+
+
 }
 

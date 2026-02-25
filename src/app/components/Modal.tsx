@@ -64,7 +64,9 @@ export default function Modal({ isOpen, title, onClose, children }: ModalProps) 
           </button>
         </div>
 
-        <div style={{ marginTop: 14 }}>{children}</div>
+        <div style={{ marginTop: 14, color: "black" }}>
+  {children}
+</div>
 
         <div style={{ marginTop: 18, display: "flex", justifyContent: "flex-end" }}>
           <Button variant="secondary" onClick={onClose}>

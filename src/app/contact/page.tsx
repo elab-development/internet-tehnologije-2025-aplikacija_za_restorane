@@ -1,6 +1,8 @@
+
 export default function ContactPage() {
   return (
-    <main style={{ padding: 24 }}>
+    <main className="p-6 min-h-screen bg-zinc-50">
+      
       
 
       <p>
