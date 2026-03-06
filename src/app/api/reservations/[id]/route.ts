@@ -10,6 +10,9 @@ function parseId(params: { id: string }) {
 
 // GET /api/reservations/:id
 export async function GET(_req: Request, { params }: { params: { id: string } }) {
+  const guard = await requireAuth();
+  if (!guard.ok) return guard.response;
+  
   const id = parseId(params);
   if (!id) return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
 

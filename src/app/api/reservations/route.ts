@@ -6,6 +6,9 @@ import { requireAuth } from "@/lib/guards";
 // GET /api/reservations
 // Poenta: vraća rezervacije + povezane podatke (user, sto, restoran)
 export async function GET() {
+  const guard = await requireAuth();
+  if (!guard.ok) return guard.response;
+
   const reservations = await prisma.reservation.findMany({
     include: {
       user: {
