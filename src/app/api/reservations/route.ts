@@ -48,9 +48,12 @@ export async function POST(req: Request) {
     const tableId = Number(body.tableId);
     const brojOsoba = Number(body.brojOsoba);
 
-    if (!Number.isFinite(userId) || !Number.isFinite(tableId) || !Number.isFinite(brojOsoba)) {
-      return NextResponse.json({ error: "userId, tableId i brojOsoba moraju biti brojevi" }, { status: 400 });
-    }
+   if (!Number.isFinite(userId) || !Number.isFinite(tableId) || !Number.isFinite(brojOsoba)) {
+      return NextResponse.json(
+        { error: "tableId i brojOsoba moraju biti brojevi" },
+        { status: 400 }
+      );
+  }
 
     // parsiranje datuma
     const dateTime = new Date(body.dateTime);

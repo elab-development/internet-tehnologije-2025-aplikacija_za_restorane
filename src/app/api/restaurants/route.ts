@@ -2,7 +2,6 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
 
-
 // GET /api/restaurants
 export async function GET() {
   const restaurants = await prisma.restaurant.findMany({
@@ -20,10 +19,9 @@ export async function POST(req: Request) {
 
     const body = await req.json();
 
-    // minimalna validacija (da ne upisuje prazno)
-    if (!body.naziv || !body.adresa || !body.radnoVreme || !body.administratorId) {
+    if (!body.naziv || !body.adresa || !body.radnoVreme) {
       return NextResponse.json(
-        { error: "Obavezno: naziv, adresa, radnoVreme, administratorId" },
+        { error: "Obavezno: naziv, adresa, radnoVreme" },
         { status: 400 }
       );
     }
@@ -34,7 +32,7 @@ export async function POST(req: Request) {
         adresa: body.adresa,
         opis: body.opis ?? null,
         radnoVreme: body.radnoVreme,
-        administratorId: Number(body.administratorId),
+        administratorId: guard.auth.userId,
       },
     });
 

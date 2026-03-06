@@ -2,16 +2,20 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
 
-
 function parseId(params: { id: string }) {
   const id = Number(params.id);
   return Number.isFinite(id) ? id : null;
 }
 
 // GET /api/tables/:id
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
   const id = parseId(params);
-  if (!id) return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
 
   const table = await prisma.table.findUnique({
     where: { id },
@@ -30,23 +34,49 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
 }
 
 // PUT /api/tables/:id
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: { id: string } }
+) {
   const guard = await requireRole(["MANAGER", "ADMIN"]);
   if (!guard.ok) return guard.response;
 
-  
   const id = parseId(params);
-  if (!id) return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
 
   const body = await req.json();
 
   const data: { brojStola?: number; kapacitet?: number } = {};
 
-  if (body.brojStola !== undefined) data.brojStola = Number(body.brojStola);
-  if (body.kapacitet !== undefined) data.kapacitet = Number(body.kapacitet);
+  if (body.brojStola !== undefined) {
+    const brojStola = Number(body.brojStola);
+    if (!Number.isFinite(brojStola)) {
+      return NextResponse.json(
+        { error: "brojStola mora biti broj" },
+        { status: 400 }
+      );
+    }
+    data.brojStola = brojStola;
+  }
+
+  if (body.kapacitet !== undefined) {
+    const kapacitet = Number(body.kapacitet);
+    if (!Number.isFinite(kapacitet)) {
+      return NextResponse.json(
+        { error: "kapacitet mora biti broj" },
+        { status: 400 }
+      );
+    }
+    data.kapacitet = kapacitet;
+  }
 
   if (Object.keys(data).length === 0) {
-    return NextResponse.json({ error: "Nema podataka za izmenu" }, { status: 400 });
+    return NextResponse.json(
+      { error: "Nema podataka za izmenu" },
+      { status: 400 }
+    );
   }
 
   try {
@@ -71,13 +101,17 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 // DELETE /api/tables/:id
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  const guard = await requireRole(["MANAGER", "ADMIN"]);
+export async function DELETE(
+  _req: Request,
+  { params }: { params: { id: string } }
+) {
+  const guard = await requireRole(["ADMIN"]);
   if (!guard.ok) return guard.response;
 
-  
   const id = parseId(params);
-  if (!id) return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
 
   try {
     await prisma.table.delete({ where: { id } });

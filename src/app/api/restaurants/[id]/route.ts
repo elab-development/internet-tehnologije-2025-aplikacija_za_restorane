@@ -57,9 +57,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 
 // DELETE /api/restaurants/:id
 export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
-  const guard = await requireRole(["MANAGER", "ADMIN"]);
+  const guard = await requireRole(["ADMIN"]);
   if (!guard.ok) return guard.response;
-  
+
   const id = toId(params);
   if (!id) return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
 

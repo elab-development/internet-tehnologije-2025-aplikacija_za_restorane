@@ -1,19 +1,55 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Button from "../components/Button";
 import Input from "../components/Input";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const router = useRouter();
 
-  function handleLogin() {
-    if (!email || !password) {
-      alert("Unesite email i lozinku");
+  const [email, setEmail] = useState("");
+  const [lozinka, setLozinka] = useState("");
+  const [greska, setGreska] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  async function handleLogin() {
+    setGreska("");
+
+    if (!email || !lozinka) {
+      setGreska("Unesite email i lozinku");
       return;
     }
-    alert("Uspešna prijava (demo)");
+
+    try {
+      setLoading(true);
+
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          email,
+          lozinka,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setGreska(data.error || "Greška pri prijavi");
+        return;
+      }
+
+      router.push("/");
+      router.refresh();
+    } catch {
+      setGreska("Greška na serveru");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -30,13 +66,19 @@ export default function LoginPage() {
       <Input
         type="password"
         placeholder="Lozinka"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        value={lozinka}
+        onChange={(e) => setLozinka(e.target.value)}
       />
+
+      {greska && (
+        <p style={{ color: "red", marginTop: 12 }}>
+          {greska}
+        </p>
+      )}
 
       <div style={{ marginTop: 16 }}>
         <Button variant="primary" onClick={handleLogin}>
-          Prijavi se
+          {loading ? "Prijavljivanje..." : "Prijavi se"}
         </Button>
       </div>
     </main>
