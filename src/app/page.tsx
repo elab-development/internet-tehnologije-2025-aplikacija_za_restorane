@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Modal from "./components/Modal";
 import Card from "./components/Card";
 import Button from "./components/Button";
+import { useRouter } from "next/navigation";
 
 type Restaurant = {
   id: number;
@@ -18,6 +19,7 @@ const fallbackImage =
   "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop";
 
 export default function Home() {
+  const router = useRouter();
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selected, setSelected] = useState<Restaurant | null>(null);
   const [open, setOpen] = useState(false);
@@ -141,11 +143,15 @@ export default function Home() {
 
               <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
                 <Button
-                  variant="success"
-                  onClick={() => alert("Rezervacija će biti povezana sledeće.")}
-                >
-                  Rezerviši sto
-                </Button>
+                    variant="success"
+                    onClick={() => {
+                      if (selected) {
+                        router.push(`/restaurants/${selected.id}/reserve`);
+                      }
+                    }}
+                  >
+                    Rezerviši sto
+                  </Button>
               </div>
             </>
           )}
