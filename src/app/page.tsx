@@ -232,7 +232,7 @@ export default function Home() {
               minWidth: 250,
             }}
           >
-            <option value="default">Podrazumevani redosled</option>
+            <option value="default">Podrazumevan redosled</option>
             <option value="rating">Sortiraj po oceni</option>
           </select>
         </div>
