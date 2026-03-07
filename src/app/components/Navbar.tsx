@@ -129,6 +129,13 @@ export default function Navbar() {
                       >
                         Upravljaj stolovima
                       </Link>
+
+                      <Link
+                        href="/manager/reservations"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                        >
+                        Zahtevi za rezervaciju
+                        </Link>
                     </div>
                   )}
                 </div>

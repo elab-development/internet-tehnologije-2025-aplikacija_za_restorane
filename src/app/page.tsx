@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Modal from "./components/Modal";
 import Card from "./components/Card";
 import Button from "./components/Button";
-import { useRouter } from "next/navigation";
 
 type Restaurant = {
   id: number;
@@ -15,26 +15,54 @@ type Restaurant = {
   administratorId: number;
 };
 
+type AuthUser = {
+  id: number;
+  uloga: "GUEST" | "MANAGER" | "ADMIN";
+};
+
 const fallbackImage =
   "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?q=80&w=1200&auto=format&fit=crop";
 
 export default function Home() {
   const router = useRouter();
+
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [selected, setSelected] = useState<Restaurant | null>(null);
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [greska, setGreska] = useState("");
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [deleteError, setDeleteError] = useState("");
 
   useEffect(() => {
-    async function loadRestaurants() {
+    async function loadPageData() {
       try {
         setLoading(true);
         setGreska("");
 
-        const res = await fetch("/api/restaurants", {
+        const meRes = await fetch("/api/auth/me", {
+          credentials: "include",
+          cache: "no-store",
+        });
+
+        let currentUser: AuthUser | null = null;
+
+        if (meRes.ok) {
+          currentUser = await meRes.json();
+          setUser(currentUser);
+        } else {
+          setUser(null);
+        }
+
+        const endpoint =
+          currentUser?.uloga === "MANAGER"
+            ? "/api/my-restaurants"
+            : "/api/restaurants";
+
+        const res = await fetch(endpoint, {
           method: "GET",
           credentials: "include",
+          cache: "no-store",
         });
 
         const data = await res.json();
@@ -52,16 +80,47 @@ export default function Home() {
       }
     }
 
-    loadRestaurants();
+    loadPageData();
   }, []);
 
+async function handleDeleteRestaurant(id: number) {
+  setDeleteError("");
+  setGreska("");
+
+  try {
+    const res = await fetch(`/api/restaurants/${id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      setDeleteError(data.error || "Greška pri brisanju restorana");
+      return;
+    }
+
+    setOpen(false);
+    setSelected(null);
+    setRestaurants((prev) =>
+      prev.filter((restaurant) => restaurant.id !== id)
+    );
+  } catch {
+    setDeleteError("Greška na serveru");
+  }
+}
+
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-8">
+    <main className="min-h-screen bg-zinc-50 px-6 py-4">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-zinc-900">Restorani u ponudi</h1>
+        <h1 className="text-3xl font-bold text-zinc-900">
+          {user?.uloga === "MANAGER" ? "Moji restorani" : "Restorani u ponudi"}
+        </h1>
 
         <p className="text-zinc-600 mb-6">
-          Pregled restorana iz baze podataka.
+          {user?.uloga === "MANAGER"
+            ? "Pregled restorana kojima upravljate."
+            : "Pregled restorana iz baze podataka."}
         </p>
 
         {loading && <p>Učitavanje restorana...</p>}
@@ -71,13 +130,13 @@ export default function Home() {
         )}
 
         {!loading && !greska && restaurants.length === 0 && (
-          <p>Trenutno nema restorana u bazi.</p>
+          <p className="text-zinc-600">Trenutno nema restorana u ponudi.</p>
         )}
 
         {!loading && !greska && restaurants.length > 0 && (
           <section className="mt-8">
             <h2 className="text-2xl font-semibold text-zinc-900 mb-4">
-              Svi restorani
+              {user?.uloga === "MANAGER" ? "Vaši restorani" : "Svi restorani"}
             </h2>
 
             <div
@@ -97,6 +156,7 @@ export default function Home() {
                   <Button
                     variant="success"
                     onClick={() => {
+                      setDeleteError("");
                       setSelected(r);
                       setOpen(true);
                     }}
@@ -142,17 +202,29 @@ export default function Home() {
               </div>
 
               <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
-                <Button
+                {user?.uloga === "MANAGER" ? (
+                  <Button
+                    variant="primary"
+                    onClick={() => handleDeleteRestaurant(selected.id)}
+                  >
+                    Obriši restoran
+                  </Button>
+                ) : (
+                  <Button
                     variant="success"
                     onClick={() => {
-                      if (selected) {
-                        router.push(`/restaurants/${selected.id}/reserve`);
-                      }
+                      router.push(`/restaurants/${selected.id}/reserve`);
                     }}
                   >
                     Rezerviši sto
                   </Button>
+                )}
               </div>
+                  {deleteError && (
+                    <p style={{ color: "red", marginTop: 12 }}>
+                      {deleteError}
+                    </p>
+                  )}
             </>
           )}
         </Modal>

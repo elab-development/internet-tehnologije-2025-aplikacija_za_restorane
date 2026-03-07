@@ -60,6 +60,25 @@ export async function PUT(
     return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
   }
 
+  const existing = await prisma.restaurant.findUnique({
+    where: { id },
+    select: { id: true, administratorId: true },
+  });
+
+  if (!existing) {
+    return NextResponse.json(
+      { error: "Restoran nije pronađen" },
+      { status: 404 }
+    );
+  }
+
+  if (
+    guard.auth.role === "MANAGER" &&
+    existing.administratorId !== guard.auth.userId
+  ) {
+    return NextResponse.json({ error: "Nemate dozvolu" }, { status: 403 });
+  }
+
   const body = await req.json();
 
   try {
@@ -74,14 +93,7 @@ export async function PUT(
     });
 
     return NextResponse.json(updated);
-  } catch (e: any) {
-    if (e?.code === "P2025") {
-      return NextResponse.json(
-        { error: "Restoran nije pronađen" },
-        { status: 404 }
-      );
-    }
-
+  } catch {
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }
@@ -91,7 +103,7 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const guard = await requireRole(["ADMIN"]);
+  const guard = await requireRole(["MANAGER", "ADMIN"]);
   if (!guard.ok) return guard.response;
 
   const { id: rawId } = await params;
@@ -101,6 +113,25 @@ export async function DELETE(
     return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
   }
 
+  const existing = await prisma.restaurant.findUnique({
+    where: { id },
+    select: { id: true, administratorId: true },
+  });
+
+  if (!existing) {
+    return NextResponse.json(
+      { error: "Restoran nije pronađen" },
+      { status: 404 }
+    );
+  }
+
+  if (
+    guard.auth.role === "MANAGER" &&
+    existing.administratorId !== guard.auth.userId
+  ) {
+    return NextResponse.json({ error: "Nemate dozvolu" }, { status: 403 });
+  }
+
   try {
     await prisma.restaurant.delete({
       where: { id },
@@ -108,6 +139,16 @@ export async function DELETE(
 
     return NextResponse.json({ ok: true });
   } catch (e: any) {
+    if (e?.code === "P2003") {
+      return NextResponse.json(
+        {
+          error:
+            "Restoran ne može da se obriše jer ima povezane stolove, rezervacije ili meni.",
+        },
+        { status: 400 }
+      );
+    }
+
     if (e?.code === "P2025") {
       return NextResponse.json(
         { error: "Restoran nije pronađen" },
