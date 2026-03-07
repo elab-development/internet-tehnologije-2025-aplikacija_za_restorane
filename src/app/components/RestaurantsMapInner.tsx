@@ -29,7 +29,7 @@ export default function RestaurantsMapInner({
       : [44.8176, 20.4633];
 
   return (
-    <div style={{ height: "450px", width: "100%", borderRadius: "12px", overflow: "hidden" }}>
+    <div style={{height: "380px", maxWidth: "900px", margin: "40px auto", borderRadius: "16px", overflow: "hidden", boxShadow: "0 10px 30px rgba(0,0,0,0.1)"}}>
       <MapContainer center={center} zoom={12} style={{ height: "100%", width: "100%" }}>
         <TileLayer
           attribution='&copy; OpenStreetMap contributors'
