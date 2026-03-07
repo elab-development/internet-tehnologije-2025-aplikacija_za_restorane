@@ -54,7 +54,7 @@ export default function Home() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-10">
+    <main className="min-h-screen bg-zinc-50 px-6 py-8">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-zinc-900">Restorani u ponudi</h1>
 
