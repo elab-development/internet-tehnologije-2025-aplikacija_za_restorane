@@ -1,3 +1,4 @@
+import { Montserrat_Underline } from "next/font/google";
 import React from "react";
 
 type CardProps = {
@@ -35,7 +36,7 @@ export default function Card({ title, description, imageUrl, children }: CardPro
       )}
       
 
-      <h3 style={{ marginTop: 12 }}>{title}</h3>
+      <h3 style={{ marginTop: 12, color: "#444", fontWeight: "bold", textDecoration: "underline" }}>{title}</h3>
       <p style={{ marginTop: 8, color: "#444" }}>{description}</p>
 
       {children && <div style={{ marginTop: 12 }}>{children}</div>}
