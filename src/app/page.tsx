@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Modal from "./components/Modal";
 import Card from "./components/Card";
 import Button from "./components/Button";
+import RestaurantsMap from "./components/RestaurantsMap";
 
 type Restaurant = {
   id: number;
@@ -228,6 +229,7 @@ async function handleDeleteRestaurant(id: number) {
             </>
           )}
         </Modal>
+        <RestaurantsMap />
       </div>
     </main>
   );
