@@ -16,6 +16,7 @@ export default function Modal({ isOpen, title, onClose, children }: ModalProps) 
     <div
       onClick={onClose}
       style={{
+        
         position: "fixed",
         inset: 0,
         background: "rgba(0,0,0,0.5)",
@@ -29,6 +30,7 @@ export default function Modal({ isOpen, title, onClose, children }: ModalProps) 
       <div
         onClick={(e) => e.stopPropagation()}
         style={{
+          color:"#444",
           background: "#fff",
           borderRadius: 14,
           padding: 20,

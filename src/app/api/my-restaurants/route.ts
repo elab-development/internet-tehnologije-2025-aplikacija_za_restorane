@@ -13,6 +13,10 @@ export async function GET() {
           select: {
             id: true,
             naziv: true,
+            adresa: true,
+            opis: true,
+            radnoVreme: true,
+            administratorId: true,
           },
           orderBy: { id: "asc" },
         })
@@ -23,6 +27,10 @@ export async function GET() {
           select: {
             id: true,
             naziv: true,
+            adresa: true,
+            opis: true,
+            radnoVreme: true,
+            administratorId: true,
           },
           orderBy: { id: "asc" },
         });
