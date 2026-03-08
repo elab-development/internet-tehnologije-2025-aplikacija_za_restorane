@@ -104,77 +104,85 @@ export default function NewTablePage() {
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 500 }}>
-      <h1>Dodavanje stola</h1>
+    <main className="min-h-screen bg-zinc-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-xl bg-white rounded-3xl shadow-md p-10">
+        <h1 className="text-4xl font-bold text-zinc-900 mb-4">
+          Dodavanje stola
+        </h1>
 
-      {loadingRestaurants ? (
-        <p>Učitavanje restorana...</p>
-      ) : restaurants.length === 0 ? (
-        <p style={{ color: "red" }}>
-          Nemate nijedan restoran. Prvo dodajte restoran.
+        <p className="text-zinc-500 text-lg mb-8">
+          Izaberite restoran i unesite podatke o novom stolu.
         </p>
-      ) : (
-        <>
-          <div style={{ marginTop: 12 }}>
-            <label
-              htmlFor="restoran"
-              style={{ display: "block", marginBottom: 6, fontWeight: 500 }}
-            >
-              Restoran
-            </label>
 
-            <select
-              id="restoran"
-              value={restoranId}
-              onChange={(e) => setRestoranId(e.target.value)}
-              style={{
-                width: "100%",
-                padding: "10px",
-                borderRadius: "8px",
-                border: "1px solid #ccc",
-              }}
-            >
-              {restaurants.map((restaurant) => (
-                <option key={restaurant.id} value={restaurant.id}>
-                  {restaurant.naziv}
-                </option>
-              ))}
-            </select>
+        {loadingRestaurants ? (
+          <p className="text-zinc-600">Učitavanje restorana...</p>
+        ) : restaurants.length === 0 ? (
+          <p className="text-red-500">
+            Nemate nijedan restoran. Prvo dodajte restoran.
+          </p>
+        ) : (
+          <div className="space-y-5">
+            <div>
+              <label
+                htmlFor="restoran"
+                className="block text-zinc-800 mb-2 font-medium"
+              >
+                Restoran
+              </label>
+
+              <select
+                id="restoran"
+                value={restoranId}
+                onChange={(e) => setRestoranId(e.target.value)}
+                className="w-full rounded-2xl border border-zinc-300 bg-white px-4 py-4 text-black outline-none"
+              >
+                {restaurants.map((restaurant) => (
+                  <option key={restaurant.id} value={restaurant.id}>
+                    {restaurant.naziv}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-zinc-800 mb-2 font-medium">
+                Broj stola
+              </label>
+              <Input
+                type="number"
+                placeholder="Unesite broj stola"
+                value={brojStola}
+                onChange={(e) => setBrojStola(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label className="block text-zinc-800 mb-2 font-medium">
+                Kapacitet
+              </label>
+              <Input
+                type="number"
+                placeholder="Unesite kapacitet"
+                value={kapacitet}
+                onChange={(e) => setKapacitet(e.target.value)}
+              />
+            </div>
+
+            {greska && <p className="text-red-500">{greska}</p>}
+            {uspeh && <p className="text-green-600">{uspeh}</p>}
+
+            <div className="pt-2">
+              <button
+                onClick={handleCreateTable}
+                disabled={loading}
+                className="w-full rounded-2xl bg-green-500 py-4 text-lg font-semibold text-white hover:bg-green-600 disabled:opacity-60"
+              >
+                {loading ? "Dodavanje..." : "Dodaj sto"}
+              </button>
+            </div>
           </div>
-
-          <Input
-            type="number"
-            placeholder="Broj stola"
-            value={brojStola}
-            onChange={(e) => setBrojStola(e.target.value)}
-          />
-
-          <Input
-            type="number"
-            placeholder="Kapacitet"
-            value={kapacitet}
-            onChange={(e) => setKapacitet(e.target.value)}
-          />
-
-          {greska && (
-            <p style={{ color: "red", marginTop: 12 }}>
-              {greska}
-            </p>
-          )}
-
-          {uspeh && (
-            <p style={{ color: "green", marginTop: 12 }}>
-              {uspeh}
-            </p>
-          )}
-
-          <div style={{ marginTop: 16 }}>
-            <Button variant="primary" onClick={handleCreateTable}>
-              {loading ? "Dodavanje..." : "Dodaj sto"}
-            </Button>
-          </div>
-        </>
-      )}
+        )}
+      </div>
     </main>
   );
 }
