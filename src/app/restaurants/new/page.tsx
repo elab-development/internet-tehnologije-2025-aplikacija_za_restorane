@@ -68,62 +68,100 @@ export default function NewRestaurantPage() {
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 500 }}>
-      <h1>Dodavanje restorana</h1>
+    <main className="min-h-screen bg-zinc-50 px-4 py-10">
+      <div className="max-w-3xl mx-auto">
+        <div className="bg-white border border-zinc-200 rounded-2xl shadow-sm p-8">
+          <div className="mb-8">
+            
+            <h1 className="text-3xl font-bold text-zinc-900 mb-2">
+              Dodavanje restorana
+            </h1>
+            <p className="text-zinc-500">
+              Unesite osnovne informacije o restoranu koji želite da dodate.
+            </p>
+          </div>
 
-      <Input
-        type="text"
-        placeholder="Naziv restorana"
-        value={naziv}
-        onChange={(e) => setNaziv(e.target.value)}
-      />
+          <div className="space-y-5">
+            <div>
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
+                Naziv restorana
+              </label>
+              <Input
+                type="text"
+                placeholder="Unesite naziv restorana"
+                value={naziv}
+                onChange={(e) => setNaziv(e.target.value)}
+              />
+            </div>
 
-      <Input
-        type="text"
-        placeholder="Adresa"
-        value={adresa}
-        onChange={(e) => setAdresa(e.target.value)}
-      />
+            <div>
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
+                Adresa
+              </label>
+              <Input
+                type="text"
+                placeholder="Unesite adresu"
+                value={adresa}
+                onChange={(e) => setAdresa(e.target.value)}
+              />
+            </div>
 
-      <div style={{ marginTop: 12 }}>
-        <textarea
-          placeholder="Opis restorana"
-          value={opis}
-          onChange={(e) => setOpis(e.target.value)}
-          rows={5}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            resize: "vertical",
-          }}
-        />
-      </div>
+            <div>
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
+                Opis restorana
+              </label>
+              <textarea
+                placeholder="Unesite kratak opis restorana"
+                value={opis}
+                onChange={(e) => setOpis(e.target.value)}
+                rows={5}
+                style={{
+                  width: "100%",
+                  padding: "12px",
+                  borderRadius: "12px",
+                  border: "1px solid #d4d4d8",
+                  resize: "vertical",
+                  backgroundColor: "#ffffff",
+                  color: "#18181b",
+                  outline: "none",
+                }}
+              />
+            </div>
 
-      <Input
-        type="text"
-        placeholder="Radno vreme (npr. 09:00-23:00)"
-        value={radnoVreme}
-        onChange={(e) => setRadnoVreme(e.target.value)}
-      />
+            <div>
+              <label className="block text-sm font-medium text-zinc-700 mb-2">
+                Radno vreme
+              </label>
+              <Input
+                type="text"
+                placeholder="Na primer: 09:00-23:00"
+                value={radnoVreme}
+                onChange={(e) => setRadnoVreme(e.target.value)}
+              />
+            </div>
+          </div>
 
-      {greska && (
-        <p style={{ color: "red", marginTop: 12 }}>
-          {greska}
-        </p>
-      )}
+          {greska && (
+            <div className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3">
+              <p className="text-red-600 text-sm">{greska}</p>
+            </div>
+          )}
 
-      {uspeh && (
-        <p style={{ color: "green", marginTop: 12 }}>
-          {uspeh}
-        </p>
-      )}
+          {uspeh && (
+            <div className="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3">
+              <p className="text-green-700 text-sm">{uspeh}</p>
+            </div>
+          )}
 
-      <div style={{ marginTop: 16 }}>
-        <Button variant="primary" onClick={handleCreateRestaurant}>
-          {loading ? "Dodavanje..." : "Dodaj restoran"}
-        </Button>
+          <div className="mt-6">
+            <button
+              onClick={handleCreateRestaurant}
+              className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition"
+            >
+              {loading ? "Dodavanje..." : "Dodaj restoran"}
+            </button>
+          </div>
+        </div>
       </div>
     </main>
   );
