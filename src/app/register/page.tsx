@@ -57,65 +57,79 @@ export default function RegisterPage() {
   }
 
   return (
-    <main style={{ padding: 24, maxWidth: 400 }}>
-      <h1>Registracija</h1>
+    <main className="min-h-screen bg-zinc-100 flex items-center justify-center px-4">
+      <div className="w-full max-w-xl bg-white rounded-3xl shadow-md p-10">
+        <h1 className="text-4xl font-bold text-zinc-900 mb-4">Registracija</h1>
 
-      <Input
-        type="text"
-        placeholder="Ime"
-        value={ime}
-        onChange={(e) => setIme(e.target.value)}
-      />
-
-      <Input
-        type="email"
-        placeholder="Email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-
-      <Input
-        type="password"
-        placeholder="Lozinka"
-        value={lozinka}
-        onChange={(e) => setLozinka(e.target.value)}
-      />
-
-      <div style={{ marginTop: 12 }}>
-        <label
-          htmlFor="uloga"
-          style={{ display: "block", marginBottom: 6, fontWeight: 500 }}
-        >
-          Uloga
-        </label>
-
-        <select
-          id="uloga"
-          value={uloga}
-          onChange={(e) => setUloga(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            borderRadius: "8px",
-            border: "1px solid #ccc",
-            color: "#000000"
-          }}
-        >
-          <option value="GUEST">Guest</option>
-          <option value="MANAGER">Manager</option>
-        </select>
-      </div>
-
-      {greska && (
-        <p style={{ color: "red", marginTop: 12 }}>
-          {greska}
+        <p className="text-zinc-500 text-lg mb-8">
+          Napravite nalog i nastavite sa korišćenjem aplikacije.
         </p>
-      )}
 
-      <div style={{ marginTop: 16 }}>
-        <Button variant="primary" onClick={handleRegister}>
-          {loading ? "Registracija..." : "Registruj se"}
-        </Button>
+        <div className="space-y-5">
+          <div>
+            <label className="block text-zinc-800 mb-2 font-medium">Ime</label>
+            <Input
+              type="text"
+              placeholder="Unesite ime"
+              value={ime}
+              onChange={(e) => setIme(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block text-zinc-800 mb-2 font-medium">Email</label>
+            <Input
+              type="email"
+              placeholder="Unesite email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label className="block text-zinc-800 mb-2 font-medium">Lozinka</label>
+            <Input
+              type="password"
+              placeholder="Unesite lozinku"
+              value={lozinka}
+              onChange={(e) => setLozinka(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="uloga"
+              className="block text-zinc-800 mb-2 font-medium"
+            >
+              Uloga
+            </label>
+
+            <select
+              id="uloga"
+              value={uloga}
+              onChange={(e) => setUloga(e.target.value)}
+              className="w-full rounded-2xl border border-zinc-300 bg-white px-4 py-4 text-black outline-none"
+            >
+              <option value="GUEST">Guest</option>
+              <option value="MANAGER">Manager</option>
+            </select>
+          </div>
+
+          {greska && <p className="text-red-500">{greska}</p>}
+
+          <div className="pt-2">
+            <Button variant="success" onClick={handleRegister}>
+              {loading ? "Registracija..." : "Registruj se"}
+            </Button>
+          </div>
+
+          <p className="text-center text-zinc-500">
+            Već imate nalog?{" "}
+            <a href="/login" className="text-green-600 font-medium">
+              Prijavite se
+            </a>
+          </p>
+        </div>
       </div>
     </main>
   );
