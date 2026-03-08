@@ -22,10 +22,13 @@ export default function Input({
       style={{
         display: "block",
         width: "100%",
-        padding: 8,
+        padding: 10,
         marginTop: 12,
-        border: "1px solid #ccc",
-        borderRadius: 4,
+        border: "1px solid #d4d4d8",
+        borderRadius: 10,
+        backgroundColor: "#ffffff",
+        color: "#18181b",
+        outline: "none",
       }}
     />
   );

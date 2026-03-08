@@ -2,20 +2,25 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
 
-
-function parseId(params: { id: string }) {
-  const id = Number(params.id);
+function parseId(idParam: string) {
+  const id = Number(idParam);
   return Number.isFinite(id) ? id : null;
 }
 
 // GET /api/users/:id
-export async function GET(_req: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const guard = await requireRole(["ADMIN"]);
   if (!guard.ok) return guard.response;
 
-  
-  const id = parseId(params);
-  if (!id) return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  const { id: rawId } = await params;
+  const id = parseId(rawId);
+
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
 
   const user = await prisma.user.findUnique({
     where: { id },
@@ -28,23 +33,30 @@ export async function GET(_req: Request, { params }: { params: { id: string } })
     },
   });
 
-  if (!user) return NextResponse.json({ error: "User nije pronađen" }, { status: 404 });
+  if (!user) {
+    return NextResponse.json({ error: "User nije pronađen" }, { status: 404 });
+  }
 
   return NextResponse.json(user);
 }
 
 // PUT /api/users/:id
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const guard = await requireRole(["ADMIN"]);
   if (!guard.ok) return guard.response;
 
-  
-  const id = parseId(params);
-  if (!id) return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  const { id: rawId } = await params;
+  const id = parseId(rawId);
+
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
 
   const body = await req.json();
 
-  // Dozvoljavamo izmenu samo ovih polja
   const data: { ime?: string; email?: string; uloga?: "GUEST" | "MANAGER" | "ADMIN" } = {};
 
   if (body.ime !== undefined) data.ime = body.ime;
@@ -91,13 +103,19 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 }
 
 // DELETE /api/users/:id
-export async function DELETE(_req: Request, { params }: { params: { id: string } }) {
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const guard = await requireRole(["ADMIN"]);
   if (!guard.ok) return guard.response;
 
-  
-  const id = parseId(params);
-  if (!id) return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  const { id: rawId } = await params;
+  const id = parseId(rawId);
+
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
 
   try {
     await prisma.user.delete({ where: { id } });

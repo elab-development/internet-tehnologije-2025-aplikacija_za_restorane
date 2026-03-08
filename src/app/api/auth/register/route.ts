@@ -7,7 +7,6 @@ export async function POST(req: Request) {
   try {
     const body = await req.json();
 
-    // obavezno
     if (!body.ime || !body.email || !body.lozinka) {
       return NextResponse.json(
         { error: "Obavezno: ime, email, lozinka" },
@@ -15,10 +14,12 @@ export async function POST(req: Request) {
       );
     }
 
-    // MVP: svako ko se registruje je GUEST (sigurnije)
-    const uloga: "GUEST" = "GUEST";
+    const allowedRoles = ["GUEST", "MANAGER"];
+    const uloga =
+      body.uloga && allowedRoles.includes(body.uloga)
+        ? body.uloga
+        : "GUEST";
 
-    // hash lozinke
     const hashed = await bcrypt.hash(String(body.lozinka), 10);
 
     const user = await prisma.user.create({
@@ -37,23 +38,30 @@ export async function POST(req: Request) {
       },
     });
 
-    // napravi token + cookie
     const token = signToken({ userId: user.id, role: user.uloga });
 
     const res = NextResponse.json(user, { status: 201 });
+
     res.cookies.set("token", token, {
       httpOnly: true,
       sameSite: "lax",
       secure: process.env.NODE_ENV === "production",
       path: "/",
-      maxAge: 60 * 60 * 24 * 7, // 7 dana
+      maxAge: 60 * 60 * 24 * 7,
     });
 
     return res;
   } catch (e: any) {
     if (e?.code === "P2002") {
-      return NextResponse.json({ error: "Email već postoji" }, { status: 409 });
+      return NextResponse.json(
+        { error: "Email već postoji" },
+        { status: 409 }
+      );
     }
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
+
+    return NextResponse.json(
+      { error: "Server error" },
+      { status: 500 }
+    );
   }
 }
