@@ -2,6 +2,11 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/guards";
 
+function parseId(idParam: string) {
+  const id = Number(idParam);
+  return Number.isFinite(id) ? id : null;
+}
+
 function isWithinWorkingHours(dateTime: Date, radnoVreme: string) {
   const [start, end] = radnoVreme.split("-");
 
@@ -25,73 +30,96 @@ function isWithinWorkingHours(dateTime: Date, radnoVreme: string) {
   return reservationMinutes >= startMinutes && reservationMinutes < endMinutes;
 }
 
-// GET /api/reservations
-// Poenta: vraća rezervacije + povezane podatke (user, sto, restoran)
-export async function GET() {
+// GET /api/reservations/:id
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const guard = await requireAuth();
   if (!guard.ok) return guard.response;
 
-  const reservations = await prisma.reservation.findMany({
+  const { id: rawId } = await params;
+  const id = parseId(rawId);
+
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
+
+  const reservation = await prisma.reservation.findUnique({
+    where: { id },
     include: {
-      user: {
-        select: { id: true, ime: true, email: true, uloga: true },
-      },
+      user: { select: { id: true, ime: true, email: true, uloga: true } },
       table: {
         include: {
-          restaurant: { select: { id: true, naziv: true, adresa: true } },
+          restaurant: {
+            select: {
+              id: true,
+              naziv: true,
+              adresa: true,
+              radnoVreme: true,
+            },
+          },
         },
       },
       order: true,
     },
-    orderBy: { dateTime: "desc" },
   });
 
-  return NextResponse.json(reservations);
+  if (!reservation) {
+    return NextResponse.json(
+      { error: "Rezervacija nije pronađena" },
+      { status: 404 }
+    );
+  }
+
+  return NextResponse.json(reservation);
 }
 
-// POST /api/reservations
-// Poenta: kreira novu rezervaciju uz osnovne provere
-export async function POST(req: Request) {
-  try {
-    const guard = await requireAuth();
-    if (!guard.ok) return guard.response;
+// PUT /api/reservations/:id
+export async function PUT(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const guard = await requireAuth();
+  if (!guard.ok) return guard.response;
 
-    const body = await req.json();
+  const { id: rawId } = await params;
+  const id = parseId(rawId);
 
-    if (!body.tableId || !body.dateTime || !body.brojOsoba) {
-      return NextResponse.json(
-        { error: "Obavezno: tableId, dateTime, brojOsoba" },
-        { status: 400 }
-      );
-    }
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
 
-    const userId = Number(guard.auth.userId);
-    const tableId = Number(body.tableId);
-    const brojOsoba = Number(body.brojOsoba);
+  const body = await req.json();
 
-    if (
-      !Number.isFinite(userId) ||
-      !Number.isFinite(tableId) ||
-      !Number.isFinite(brojOsoba)
-    ) {
-      return NextResponse.json(
-        { error: "tableId i brojOsoba moraju biti brojevi" },
-        { status: 400 }
-      );
-    }
+  const existingReservation = await prisma.reservation.findUnique({
+    where: { id },
+    include: {
+      table: {
+        include: {
+          restaurant: {
+            select: {
+              id: true,
+              radnoVreme: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
-    const dateTime = new Date(body.dateTime);
-    if (Number.isNaN(dateTime.getTime())) {
-      return NextResponse.json(
-        { error: "dateTime nije validan datum" },
-        { status: 400 }
-      );
-    }
+  if (!existingReservation) {
+    return NextResponse.json(
+      { error: "Rezervacija nije pronađena" },
+      { status: 404 }
+    );
+  }
 
+  const data: { status?: string; brojOsoba?: number; dateTime?: Date } = {};
+
+  if (body.status !== undefined) {
     const allowedStatuses = ["PENDING", "CONFIRMED", "CANCELLED", "COMPLETED"];
-    const status = body.status ?? "PENDING";
-
-    if (!allowedStatuses.includes(status)) {
+    if (!allowedStatuses.includes(body.status)) {
       return NextResponse.json(
         {
           error:
@@ -101,46 +129,70 @@ export async function POST(req: Request) {
       );
     }
 
-    // Provera da sto postoji + kapacitet + restoran i radno vreme
-    const table = await prisma.table.findUnique({
-      where: { id: tableId },
-      include: {
-        restaurant: {
-          select: {
-            id: true,
-            naziv: true,
-            radnoVreme: true,
-          },
-        },
-      },
-    });
+    data.status = body.status;
+  }
 
-    if (!table) {
-      return NextResponse.json({ error: "Sto ne postoji" }, { status: 404 });
+  if (body.brojOsoba !== undefined) {
+    const brojOsoba = Number(body.brojOsoba);
+
+    if (!Number.isFinite(brojOsoba)) {
+      return NextResponse.json(
+        { error: "brojOsoba mora biti broj" },
+        { status: 400 }
+      );
     }
 
-    if (brojOsoba > table.kapacitet) {
+    if (brojOsoba > existingReservation.table.kapacitet) {
       return NextResponse.json(
         { error: "Broj osoba prelazi kapacitet stola" },
         { status: 400 }
       );
     }
 
-    if (!isWithinWorkingHours(dateTime, table.restaurant.radnoVreme)) {
+    data.brojOsoba = brojOsoba;
+  }
+
+  let newDateTime: Date | null = null;
+
+  if (body.dateTime !== undefined) {
+    const dt = new Date(body.dateTime);
+
+    if (Number.isNaN(dt.getTime())) {
+      return NextResponse.json(
+        { error: "dateTime nije validan datum" },
+        { status: 400 }
+      );
+    }
+
+    if (
+      !isWithinWorkingHours(dt, existingReservation.table.restaurant.radnoVreme)
+    ) {
       return NextResponse.json(
         { error: "Rezervacija nije moguća van radnog vremena restorana" },
         { status: 400 }
       );
     }
 
-    // Pravilo: jedna rezervacija traje 2 sata
+    newDateTime = dt;
+    data.dateTime = dt;
+  }
+
+  if (Object.keys(data).length === 0) {
+    return NextResponse.json(
+      { error: "Nema podataka za izmenu" },
+      { status: 400 }
+    );
+  }
+
+  if (newDateTime) {
     const reservationDurationMs = 2 * 60 * 60 * 1000;
-    const newStart = dateTime;
-    const newEnd = new Date(dateTime.getTime() + reservationDurationMs);
+    const newStart = newDateTime;
+    const newEnd = new Date(newDateTime.getTime() + reservationDurationMs);
 
     const existingReservations = await prisma.reservation.findMany({
       where: {
-        tableId,
+        tableId: existingReservation.tableId,
+        id: { not: id },
         status: {
           in: ["PENDING", "CONFIRMED"],
         },
@@ -162,23 +214,71 @@ export async function POST(req: Request) {
         { status: 409 }
       );
     }
+  }
 
-    const reservation = await prisma.reservation.create({
-      data: {
-        userId,
-        tableId,
-        dateTime,
-        brojOsoba,
-        status,
-      },
+  try {
+    const updated = await prisma.reservation.update({
+      where: { id },
+      data,
     });
 
-    return NextResponse.json(reservation, { status: 201 });
+    return NextResponse.json(updated);
   } catch (e: any) {
+    console.error("PUT reservation error:", e);
+
+    if (e?.code === "P2025") {
+      return NextResponse.json(
+        { error: "Rezervacija nije pronađena" },
+        { status: 404 }
+      );
+    }
+
     if (e?.code === "P2002") {
       return NextResponse.json(
-        { error: "Rezervacija već postoji za ovog korisnika, sto i termin" },
+        { error: "Duplikat: user + table + dateTime već postoji" },
         { status: 409 }
+      );
+    }
+
+    return NextResponse.json({ error: "Server error" }, { status: 500 });
+  }
+}
+
+// DELETE /api/reservations/:id
+export async function DELETE(
+  _req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  const guard = await requireAuth();
+  if (!guard.ok) return guard.response;
+
+  const { id: rawId } = await params;
+  const id = parseId(rawId);
+
+  if (!id) {
+    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
+  }
+
+  try {
+    await prisma.reservation.delete({
+      where: { id },
+    });
+
+    return NextResponse.json({ ok: true });
+  } catch (e: any) {
+    console.error("DELETE reservation error:", e);
+
+    if (e?.code === "P2025") {
+      return NextResponse.json(
+        { error: "Rezervacija nije pronađena" },
+        { status: 404 }
+      );
+    }
+
+    if (e?.code === "P2003") {
+      return NextResponse.json(
+        { error: "Rezervacija ne može da se obriše jer ima povezane podatke." },
+        { status: 400 }
       );
     }
 

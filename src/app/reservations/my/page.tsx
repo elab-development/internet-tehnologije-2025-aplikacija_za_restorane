@@ -55,21 +55,35 @@ export default function MyReservationsPage() {
     loadReservations();
   }, []);
 
-  async function handleDeleteReservation(id: number) {
+  async function handleCancelReservation(id: number) {
     try {
+      setGreska("");
+
       const res = await fetch(`/api/reservations/${id}`, {
-        method: "DELETE",
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
         credentials: "include",
+        body: JSON.stringify({
+          status: "CANCELLED",
+        }),
       });
 
       const data = await res.json();
 
       if (!res.ok) {
-        setGreska(data.error || "Greška pri brisanju rezervacije");
+        setGreska(data.error || "Greška pri otkazivanju rezervacije");
         return;
       }
 
-      setReservations((prev) => prev.filter((reservation) => reservation.id !== id));
+      setReservations((prev) =>
+        prev.map((reservation) =>
+          reservation.id === id
+            ? { ...reservation, status: "CANCELLED" }
+            : reservation
+        )
+      );
     } catch {
       setGreska("Greška na serveru");
     }
@@ -135,12 +149,14 @@ export default function MyReservationsPage() {
                 </div>
 
                 <div className="mt-4">
-                  <Button
-                    variant="primary"
-                    onClick={() => handleDeleteReservation(reservation.id)}
-                  >
-                    Otkaži rezervaciju
-                  </Button>
+                  {reservation.status !== "CANCELLED" && (
+                    <Button
+                      variant="primary"
+                      onClick={() => handleCancelReservation(reservation.id)}
+                    >
+                      Otkaži rezervaciju
+                    </Button>
+                  )}
                 </div>
               </div>
             ))}
