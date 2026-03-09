@@ -65,6 +65,11 @@ export default function NewTablePage() {
       return;
     }
 
+    if (Number(brojStola) < 1 || Number(kapacitet) < 1) {
+      setGreska("Broj stola i kapacitet moraju biti veći od 0");
+      return;
+    }
+
     try {
       setLoading(true);
 
@@ -76,8 +81,8 @@ export default function NewTablePage() {
         credentials: "include",
         body: JSON.stringify({
           restoranId: Number(restoranId),
-          brojStola: Number(brojStola),
-          kapacitet: Number(kapacitet),
+          brojStola: Math.max(1, Number(brojStola)),
+          kapacitet: Math.max(1, Number(kapacitet)),
         }),
       });
 
@@ -148,10 +153,12 @@ export default function NewTablePage() {
               <label className="block text-zinc-800 mb-2 font-medium">
                 Broj stola
               </label>
-              <Input
+              <input
                 type="number"
+                min="1"
                 placeholder="Unesite broj stola"
                 value={brojStola}
+                onKeyDown={(e) => e.key === "-" && e.preventDefault()}
                 onChange={(e) => setBrojStola(e.target.value)}
               />
             </div>
@@ -160,10 +167,12 @@ export default function NewTablePage() {
               <label className="block text-zinc-800 mb-2 font-medium">
                 Kapacitet
               </label>
-              <Input
+              <input
                 type="number"
+                min="1"
                 placeholder="Unesite kapacitet"
                 value={kapacitet}
+                onKeyDown={(e) => e.key === "-" && e.preventDefault()}
                 onChange={(e) => setKapacitet(e.target.value)}
               />
             </div>
