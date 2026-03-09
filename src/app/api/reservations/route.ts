@@ -20,9 +20,26 @@ function isWithinWorkingHours(dateTime: Date, radnoVreme: string) {
 
   const reservationMinutes = dateTime.getHours() * 60 + dateTime.getMinutes();
   const startMinutes = startHour * 60 + startMinute;
-  const endMinutes = endHour * 60 + endMinute;
+  let endMinutes = endHour * 60 + endMinute;
 
-  return reservationMinutes >= startMinutes && reservationMinutes < endMinutes;
+  // ako je kraj 00:00
+  if (endMinutes === 0) {
+    endMinutes = 24 * 60;
+  }
+
+  // standardno npr 08 - 23
+  if (startMinutes < endMinutes) {
+    return (
+      reservationMinutes >= startMinutes &&
+      reservationMinutes < endMinutes
+    );
+  }
+
+  // kada je ponoc npr 20 - 02:00
+  return (
+    reservationMinutes >= startMinutes ||
+    reservationMinutes < endMinutes
+  );
 }
 
 // GET /api/reservations
