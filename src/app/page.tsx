@@ -268,7 +268,7 @@ export default function Home() {
               <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
                 {user?.uloga === "MANAGER" ? (
                   <Button
-                    variant="primary"
+                    variant="success"
                     onClick={() => handleDeleteRestaurant(selected.id)}
                   >
                     Obriši restoran
