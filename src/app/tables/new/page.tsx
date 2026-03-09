@@ -122,8 +122,7 @@ export default function NewTablePage() {
     return tables.find(
       (table) =>
         String(table.restoranId) === restoranId &&
-        table.brojStola === Number(brojStola) &&
-        table.kapacitet === Number(kapacitet)
+        table.brojStola === Number(brojStola)
     );
   }
 
