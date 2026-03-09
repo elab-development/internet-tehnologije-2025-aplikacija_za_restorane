@@ -3,10 +3,22 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+
     "dev": "next dev",
     "build": "prisma generate && next build",
     "start": "next start"
   },
+
+  "scripts": {
+  "dev": "next dev",
+  "build": "prisma generate && next build",
+  "start": "next start",
+  "test": "vitest run",
+  "test:watch": "vitest",
+  "test:coverage": "vitest run --coverage"
+},
+
+
   "dependencies": {
     "@prisma/client": "^6.19.2",
     "bcryptjs": "^3.0.3",
@@ -31,13 +43,16 @@
     "@types/react-dom": "^19",
     "@types/swagger-jsdoc": "^6.0.4",
     "@types/swagger-ui-react": "^5.18.0",
+    "@vitest/coverage-v8": "^4.0.18",
     "autoprefixer": "^10.4.24",
     "babel-plugin-react-compiler": "1.0.0",
     "postcss": "^8.5.8",
     "tailwindcss": "^4.2.1",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vite-tsconfig-paths": "^6.1.1",
+    "vitest": "^4.0.18"
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
