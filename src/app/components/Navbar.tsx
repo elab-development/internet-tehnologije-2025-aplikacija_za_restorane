@@ -52,8 +52,7 @@ export default function Navbar() {
 
     setUser(null);
     setOpenManage(false);
-    router.push("/");
-    router.refresh();
+    window.location.href = "/";
   }
 
   function leftNavClass(path: string) {

@@ -266,24 +266,36 @@ export default function Home() {
               </div>
 
               <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
-                {user?.uloga === "MANAGER" ? (
+
+              {user?.uloga === "MANAGER" ? (
+                <>
+                  <Button
+                    variant="success"
+                    onClick={() => {
+                      router.push(`/restaurants/${selected.id}/edit`);
+                    }}
+                  >
+                    Izmeni restoran
+                  </Button>
+
                   <Button
                     variant="success"
                     onClick={() => handleDeleteRestaurant(selected.id)}
                   >
                     Obriši restoran
                   </Button>
-                ) : (
-                  <Button
-                    variant="success"
-                    onClick={() => {
-                      router.push(`/restaurants/${selected.id}/reserve`);
-                    }}
-                  >
-                    Rezerviši sto
-                  </Button>
-                )}
-              </div>
+                </>
+              ) : (
+                <Button
+                  variant="success"
+                  onClick={() => {
+                    router.push(`/restaurants/${selected.id}/reserve`);
+                  }}
+                >
+                  Rezerviši sto
+                </Button>
+              )}
+            </div>
 
               {deleteError && (
                 <p style={{ color: "red", marginTop: 12 }}>
@@ -293,7 +305,7 @@ export default function Home() {
             </>
           )}
         </Modal>
-        <RestaurantsMap />
+        <RestaurantsMap restaurants={filteredRestaurants} user={user} />
       </div>
     </main>
   );

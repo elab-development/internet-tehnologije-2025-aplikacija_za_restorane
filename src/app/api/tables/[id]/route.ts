@@ -109,7 +109,7 @@ export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  const guard = await requireRole(["ADMIN"]);
+  const guard = await requireRole(["MANAGER","ADMIN"]);
   if (!guard.ok) return guard.response;
 
   const { id: rawId } = await params;
@@ -125,6 +125,10 @@ export async function DELETE(
   } catch (e: any) {
     if (e?.code === "P2025") {
       return NextResponse.json({ error: "Sto nije pronađen" }, { status: 404 });
+    }
+    if (e?.code === "P2003") {
+      return NextResponse.json(
+        { error: "Sto ne može da se obriše jer ima povezane rezervacije" }, { status: 404 });
     }
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }

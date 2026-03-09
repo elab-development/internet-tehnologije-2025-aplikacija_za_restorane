@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Modal from "../../components/Modal";
+import Input from "../../components/Input";
 
 type Reservation = {
   id: number;
@@ -15,6 +17,7 @@ type Reservation = {
       id: number;
       naziv: string;
       adresa: string;
+      radnoVreme?: string;
     };
   };
 };
@@ -23,6 +26,16 @@ export default function MyReservationsPage() {
   const [reservations, setReservations] = useState<Reservation[]>([]);
   const [loading, setLoading] = useState(true);
   const [greska, setGreska] = useState("");
+
+  const [openEdit, setOpenEdit] = useState(false);
+  const [selectedReservation, setSelectedReservation] =
+    useState<Reservation | null>(null);
+
+  const [editDateTime, setEditDateTime] = useState("");
+  const [editBrojOsoba, setEditBrojOsoba] = useState("");
+  const [editLoading, setEditLoading] = useState(false);
+  const [editError, setEditError] = useState("");
+  const [editSuccess, setEditSuccess] = useState("");
 
   useEffect(() => {
     async function loadReservations() {
@@ -88,22 +101,98 @@ export default function MyReservationsPage() {
     }
   }
 
+  function openEditModal(reservation: Reservation) {
+    setSelectedReservation(reservation);
+    setEditError("");
+    setEditSuccess("");
+
+    const dt = new Date(reservation.dateTime);
+    const localDateTime = new Date(
+      dt.getTime() - dt.getTimezoneOffset() * 60000
+    )
+      .toISOString()
+      .slice(0, 16);
+
+    setEditDateTime(localDateTime);
+    setEditBrojOsoba(String(reservation.brojOsoba));
+    setOpenEdit(true);
+  }
+
+  async function handleUpdateReservation() {
+    if (!selectedReservation) return;
+
+    setEditError("");
+    setEditSuccess("");
+
+    if (!editDateTime || !editBrojOsoba) {
+      setEditError("Unesite datum/vreme i broj osoba");
+      return;
+    }
+
+    try {
+      setEditLoading(true);
+
+      const res = await fetch(`/api/reservations/${selectedReservation.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          dateTime: new Date(editDateTime).toISOString(),
+          brojOsoba: Number(editBrojOsoba),
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        setEditError(data.error || "Izmena rezervacije nije moguća");
+        return;
+      }
+
+      setReservations((prev) =>
+        prev.map((reservation) =>
+          reservation.id === selectedReservation.id
+            ? {
+                ...reservation,
+                dateTime: data.dateTime,
+                brojOsoba: data.brojOsoba,
+                status: data.status,
+              }
+            : reservation
+        )
+      );
+
+      setEditSuccess("Rezervacija je uspešno izmenjena.");
+
+      setTimeout(() => {
+        setOpenEdit(false);
+        setSelectedReservation(null);
+      }, 1000);
+    } catch {
+      setEditError("Greška na serveru");
+    } finally {
+      setEditLoading(false);
+    }
+  }
+
   function formatDate(dateString: string) {
-  const date = new Date(dateString);
+    const date = new Date(dateString);
 
-  const datum = date.toLocaleDateString("sr-RS", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+    const datum = date.toLocaleDateString("sr-RS", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
 
-  const vreme = date.toLocaleTimeString("sr-RS", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+    const vreme = date.toLocaleTimeString("sr-RS", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-  return `${datum} u ${vreme}`;
-}
+    return `${datum} u ${vreme}`;
+  }
 
   function formatStatus(status: string) {
     if (status === "PENDING") return "Na čekanju";
@@ -185,14 +274,23 @@ export default function MyReservationsPage() {
                   </p>
                 </div>
 
-                <div className="mt-6">
+                <div className="mt-6 flex gap-3">
                   {reservation.status !== "CANCELLED" && (
-                    <button
-                      onClick={() => handleCancelReservation(reservation.id)}
-                      className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition"
-                    >
-                      Otkaži rezervaciju
-                    </button>
+                    <>
+                      <button
+                        onClick={() => openEditModal(reservation)}
+                        className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition"
+                      >
+                        Izmeni rezervaciju
+                      </button>
+
+                      <button
+                        onClick={() => handleCancelReservation(reservation.id)}
+                        className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition"
+                      >
+                        Otkaži rezervaciju
+                      </button>
+                    </>
                   )}
                 </div>
               </div>
@@ -200,6 +298,105 @@ export default function MyReservationsPage() {
           </div>
         )}
       </div>
+
+      <Modal
+        isOpen={openEdit}
+        title="Izmena rezervacije"
+        onClose={() => {
+          setOpenEdit(false);
+          setSelectedReservation(null);
+          setEditError("");
+          setEditSuccess("");
+        }}
+      >
+        {selectedReservation && (
+          <>
+            <div style={{ lineHeight: 1.8 }}>
+              <div>
+                <b>Restoran:</b> {selectedReservation.table.restaurant.naziv}
+              </div>
+              <div>
+                <b>Adresa:</b> {selectedReservation.table.restaurant.adresa}
+              </div>
+              <div>
+                <b>Sto:</b> #{selectedReservation.table.brojStola}
+              </div>
+              <div>
+                <b>Kapacitet stola:</b> {selectedReservation.table.kapacitet}
+              </div>
+              {selectedReservation.table.restaurant.radnoVreme && (
+                <div>
+                  <b>Radno vreme:</b>{" "}
+                  {selectedReservation.table.restaurant.radnoVreme}
+                </div>
+              )}
+            </div>
+
+            <div style={{ marginTop: 16 }}>
+              <label
+                htmlFor="editDateTime"
+                style={{ display: "block", marginBottom: 6, fontWeight: 500 }}
+              >
+                Novi datum i vreme
+              </label>
+
+              <input
+                id="editDateTime"
+                type="datetime-local"
+                value={editDateTime}
+                onChange={(e) => setEditDateTime(e.target.value)}
+                style={{
+                  width: "100%",
+                  padding: "10px",
+                  borderRadius: "8px",
+                  border: "1px solid #ccc",
+                  color: "black",
+                  backgroundColor: "white",
+                }}
+              />
+            </div>
+
+            <div style={{ marginTop: 12 }}>
+              <Input
+                type="number"
+                placeholder="Broj osoba"
+                value={editBrojOsoba}
+                onChange={(e) => setEditBrojOsoba(e.target.value)}
+              />
+            </div>
+
+            {editError && (
+              <p style={{ color: "red", marginTop: 12 }}>{editError}</p>
+            )}
+
+            {editSuccess && (
+              <p style={{ color: "green", marginTop: 12 }}>{editSuccess}</p>
+            )}
+
+            <div style={{ marginTop: 16, display: "flex", gap: 10 }}>
+              <button
+                onClick={handleUpdateReservation}
+                disabled={editLoading}
+                className="bg-green-600 hover:bg-green-700 disabled:opacity-60 text-white font-semibold px-6 py-3 rounded-xl transition"
+              >
+                {editLoading ? "Čuvanje..." : "Sačuvaj izmene"}
+              </button>
+
+              <button
+                onClick={() => {
+                  setOpenEdit(false);
+                  setSelectedReservation(null);
+                  setEditError("");
+                  setEditSuccess("");
+                }}
+                className="bg-zinc-700 hover:bg-zinc-800 text-white font-semibold px-6 py-3 rounded-xl transition"
+              >
+                Otkaži
+              </button>
+            </div>
+          </>
+        )}
+      </Modal>
     </main>
   );
 }
