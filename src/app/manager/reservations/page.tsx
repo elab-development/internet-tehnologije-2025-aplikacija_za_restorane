@@ -59,7 +59,10 @@ export default function ManagerReservationsPage() {
     loadRequests();
   }, []);
 
-  async function handleUpdateStatus(id: number, status: "CONFIRMED" | "CANCELLED") {
+  async function handleUpdateStatus(
+    id: number,
+    status: "CONFIRMED" | "CANCELLED"
+  ) {
     try {
       const res = await fetch(`/api/manager/reservation-requests/${id}`, {
         method: "PATCH",
@@ -98,7 +101,9 @@ export default function ManagerReservationsPage() {
   return (
     <main className="min-h-screen bg-zinc-50 px-6 py-6">
       <div className="max-w-5xl mx-auto">
-        <h1 className="text-3xl font-bold text-zinc-900">Zahtevi za rezervaciju</h1>
+        <h1 className="text-3xl font-bold text-zinc-900">
+          Zahtevi za rezervaciju
+        </h1>
 
         <p className="text-zinc-600 mt-2 mb-6">
           Ovde možete da odobrite ili odbijete pending rezervacije.
@@ -113,37 +118,48 @@ export default function ManagerReservationsPage() {
         )}
 
         {!loading && !greska && requests.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {requests.map((request) => (
               <div
                 key={request.id}
-                className="bg-white border rounded-lg shadow-sm p-5"
+                className="bg-white border rounded-2xl shadow-md p-6 hover:shadow-lg transition"
               >
-                <h2 className="text-xl font-semibold text-zinc-900">
-                  {request.table.restaurant.naziv}
+                <h2 className="text-2xl font-semibold text-zinc-900 flex items-center gap-2">
+                  🍽 {request.table.restaurant.naziv}
                 </h2>
 
-                <p className="text-zinc-600">{request.table.restaurant.adresa}</p>
+                <p className="text-zinc-600 mt-1">
+                  📍 {request.table.restaurant.adresa}
+                </p>
 
-                <div className="mt-3 space-y-1 text-zinc-800">
+                <hr className="my-4" />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-8 text-zinc-800">
                   <p>
-                    <b>Korisnik:</b> {request.user.ime} ({request.user.email})
+                    👤 <b>Korisnik:</b> {request.user.ime} ({request.user.email})
                   </p>
+
                   <p>
-                    <b>Sto:</b> #{request.table.brojStola}
+                    🪑 <b>Sto:</b> #{request.table.brojStola}
                   </p>
+
                   <p>
-                    <b>Datum i vreme:</b> {formatDate(request.dateTime)}
+                    📅 <b>Datum i vreme:</b> {formatDate(request.dateTime)}
                   </p>
+
                   <p>
-                    <b>Broj osoba:</b> {request.brojOsoba}
+                    👥 <b>Broj osoba:</b> {request.brojOsoba}
                   </p>
-                  <p>
-                    <b>Status:</b> {request.status}
-                  </p>
+
+                  <div className="flex items-center gap-2 md:col-span-2">
+                    <b>Status:</b>
+                    <span className="px-3 py-1 rounded-full text-sm bg-yellow-100 text-yellow-800">
+                      {request.status}
+                    </span>
+                  </div>
                 </div>
 
-                <div className="mt-4 flex gap-3">
+                <div className="mt-5 flex gap-3">
                   <Button
                     variant="success"
                     onClick={() => handleUpdateStatus(request.id, "CONFIRMED")}
@@ -152,7 +168,7 @@ export default function ManagerReservationsPage() {
                   </Button>
 
                   <Button
-                    variant="primary"
+                    variant="success"
                     onClick={() => handleUpdateStatus(request.id, "CANCELLED")}
                   >
                     Odbij
