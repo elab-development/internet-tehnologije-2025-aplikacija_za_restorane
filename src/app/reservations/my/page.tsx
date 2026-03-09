@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Button from "../../components/Button";
 
 type Reservation = {
   id: number;
@@ -90,27 +89,53 @@ export default function MyReservationsPage() {
   }
 
   function formatDate(dateString: string) {
-    const date = new Date(dateString);
+  const date = new Date(dateString);
 
-    return date.toLocaleString("sr-RS", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
+  const datum = date.toLocaleDateString("sr-RS", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  const vreme = date.toLocaleTimeString("sr-RS", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return `${datum} u ${vreme}`;
+}
+
+  function formatStatus(status: string) {
+    if (status === "PENDING") return "Na čekanju";
+    if (status === "CONFIRMED") return "Potvrđena";
+    if (status === "CANCELLED") return "Otkazana";
+    if (status === "COMPLETED") return "Završena";
+    return status;
+  }
+
+  function statusClasses(status: string) {
+    if (status === "PENDING") {
+      return "bg-amber-50 text-amber-700 border border-amber-200";
+    }
+    if (status === "CONFIRMED") {
+      return "bg-green-50 text-green-700 border border-green-200";
+    }
+    if (status === "CANCELLED") {
+      return "bg-red-50 text-red-700 border border-red-200";
+    }
+    return "bg-zinc-100 text-zinc-700 border border-zinc-200";
   }
 
   return (
-    <main className="min-h-screen bg-zinc-50 px-6 py-6">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-zinc-900">Moje rezervacije</h1>
+    <main className="min-h-screen bg-zinc-50 px-6 py-8">
+      <div className="max-w-5xl mx-auto">
+        <h1 className="text-4xl font-bold text-zinc-900">Moje rezervacije</h1>
 
-        <p className="text-zinc-600 mt-2 mb-6">
+        <p className="text-zinc-600 mt-3 mb-8 text-lg">
           Ovde možete videti sve vaše rezervacije.
         </p>
 
-        {loading && <p>Učitavanje rezervacija...</p>}
+        {loading && <p className="text-zinc-600">Učitavanje rezervacija...</p>}
 
         {greska && <p className="text-red-600">{greska}</p>}
 
@@ -119,43 +144,55 @@ export default function MyReservationsPage() {
         )}
 
         {!loading && !greska && reservations.length > 0 && (
-          <div className="space-y-4">
+          <div className="space-y-5">
             {reservations.map((reservation) => (
               <div
                 key={reservation.id}
-                className="bg-white border rounded-lg shadow-sm p-5"
+                className="bg-white border border-zinc-200 rounded-2xl shadow-sm p-7"
               >
-                <h2 className="text-xl font-semibold text-zinc-900">
-                  {reservation.table.restaurant.naziv}
-                </h2>
+                <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                  <div>
+                    <h2 className="text-3xl font-bold text-zinc-900">
+                      {reservation.table.restaurant.naziv}
+                    </h2>
 
-                <p className="text-zinc-600 mt-1">
-                  {reservation.table.restaurant.adresa}
-                </p>
+                    <p className="text-zinc-600 mt-2 text-lg">
+                      {reservation.table.restaurant.adresa}
+                    </p>
+                  </div>
 
-                <div className="mt-3 space-y-1 text-zinc-800">
+                  <span
+                    className={`inline-flex w-fit rounded-full px-4 py-2 text-sm font-semibold ${statusClasses(
+                      reservation.status
+                    )}`}
+                  >
+                    {formatStatus(reservation.status)}
+                  </span>
+                </div>
+
+                <div className="mt-6 grid gap-3 text-zinc-800">
                   <p>
-                    <b>Sto:</b> #{reservation.table.brojStola}
+                    <span className="font-semibold">Sto:</span>{" "}
+                    {reservation.table.brojStola}
                   </p>
                   <p>
-                    <b>Datum i vreme:</b> {formatDate(reservation.dateTime)}
+                    <span className="font-semibold">Datum i vreme:</span>{" "}
+                    {formatDate(reservation.dateTime)}
                   </p>
                   <p>
-                    <b>Broj osoba:</b> {reservation.brojOsoba}
-                  </p>
-                  <p>
-                    <b>Status:</b> {reservation.status}
+                    <span className="font-semibold">Broj osoba:</span>{" "}
+                    {reservation.brojOsoba}
                   </p>
                 </div>
 
-                <div className="mt-4">
+                <div className="mt-6">
                   {reservation.status !== "CANCELLED" && (
-                    <Button
-                      variant="primary"
+                    <button
                       onClick={() => handleCancelReservation(reservation.id)}
+                      className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition"
                     >
                       Otkaži rezervaciju
-                    </Button>
+                    </button>
                   )}
                 </div>
               </div>
