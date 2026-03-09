@@ -25,6 +25,26 @@ Menadžeri restorana mogu da upravljaju restoranima, stolovima i zahtevima za re
 
 ## Pokretanje aplikacije
 
-1. Klonirati repozitorijum:
-```bash
+1. Klonirati repozitorijum
+
 git clone https://github.com/elab-development/internet-tehnologije-2025-aplikacija_za_restorane.git
+
+2. Uci u folder projekta
+
+cd internet-tehnologije-2025-aplikacija_za_restorane
+
+3. Instalirati zavisnosti
+
+npm install
+
+4. Pokrenuti aplikaciju
+
+npm run dev
+
+5. Aplikacija će biti dostupna na adresi
+
+http://localhost:3000
+
+## Napomena
+
+Za pravilno funkcionisanje aplikacije potrebno je da baza podataka bude pokrenuta i da je pravilno podesen `.env` fajl.
