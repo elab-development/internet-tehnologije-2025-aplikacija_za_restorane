@@ -2,6 +2,21 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
 
+/**
+ * @swagger
+ * /api/manager/reservation-requests:
+ *   get:
+ *     summary: Vraća zahteve za rezervacije za restorane menadžera
+ *     tags:
+ *       - Manager
+ *     responses:
+ *       200:
+ *         description: Lista zahteva za rezervaciju
+ *       401:
+ *         description: Korisnik nije prijavljen
+ *       403:
+ *         description: Samo menadžer ili admin
+ */
 // GET /api/manager/reservation-requests
 export async function GET() {
   const guard = await requireRole(["MANAGER", "ADMIN"]);

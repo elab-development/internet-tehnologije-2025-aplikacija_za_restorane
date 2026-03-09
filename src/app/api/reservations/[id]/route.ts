@@ -47,6 +47,25 @@ function isWithinWorkingHours(dateTime: Date, radnoVreme: string) {
   );
 }
 
+/**
+ * @swagger
+ * /api/reservations/{id}:
+ *   get:
+ *     summary: Vraća jednu rezervaciju po ID-u
+ *     tags:
+ *       - Reservations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Jedna rezervacija
+ *       404:
+ *         description: Rezervacija nije pronađena
+ */
 // GET /api/reservations/:id
 export async function GET(
   _req: Request,
@@ -92,6 +111,44 @@ export async function GET(
   return NextResponse.json(reservation);
 }
 
+/**
+ * @swagger
+ * /api/reservations/{id}:
+ *   put:
+ *     summary: Menja rezervaciju
+ *     tags:
+ *       - Reservations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               dateTime:
+ *                 type: string
+ *                 format: date-time
+ *               brojOsoba:
+ *                 type: integer
+ *               status:
+ *                 type: string
+ *                 enum: [PENDING, CONFIRMED, CANCELLED, COMPLETED]
+ *     responses:
+ *       200:
+ *         description: Rezervacija uspešno izmenjena
+ *       400:
+ *         description: Nevalidni podaci
+ *       409:
+ *         description: Termin se preklapa sa postojećom rezervacijom
+ *       404:
+ *         description: Rezervacija nije pronađena
+ */
 // PUT /api/reservations/:id
 export async function PUT(
   req: Request,
@@ -261,6 +318,25 @@ export async function PUT(
   }
 }
 
+/**
+ * @swagger
+ * /api/reservations/{id}:
+ *   delete:
+ *     summary: Briše rezervaciju
+ *     tags:
+ *       - Reservations
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Rezervacija uspešno obrisana
+ *       404:
+ *         description: Rezervacija nije pronađena
+ */
 // DELETE /api/reservations/:id
 export async function DELETE(
   _req: Request,

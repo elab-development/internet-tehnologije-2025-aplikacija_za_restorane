@@ -7,6 +7,25 @@ function parseId(idParam: string) {
   return Number.isFinite(id) ? id : null;
 }
 
+/**
+ * @swagger
+ * /api/tables/{id}:
+ *   get:
+ *     summary: Vraća jedan sto po ID-u
+ *     tags:
+ *       - Tables
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Jedan sto
+ *       404:
+ *         description: Sto nije pronađen
+ */
 // GET /api/tables/:id
 export async function GET(
   _req: Request,
@@ -35,6 +54,36 @@ export async function GET(
   return NextResponse.json(table);
 }
 
+/**
+ * @swagger
+ * /api/tables/{id}:
+ *   put:
+ *     summary: Menja sto
+ *     tags:
+ *       - Tables
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               brojStola:
+ *                 type: integer
+ *               kapacitet:
+ *                 type: integer
+ *     responses:
+ *       200:
+ *         description: Sto uspešno izmenjen
+ *       409:
+ *         description: Sto sa tim brojem već postoji
+ */
 // PUT /api/tables/:id
 export async function PUT(
   req: Request,
@@ -104,6 +153,29 @@ export async function PUT(
   }
 }
 
+/**
+ * @swagger
+ * /api/tables/{id}:
+ *   delete:
+ *     summary: Briše sto
+ *     tags:
+ *       - Tables
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Sto uspešno obrisan
+ *       400:
+ *         description: Sto ima povezane rezervacije
+ *       403:
+ *         description: Nema dozvolu
+ *       404:
+ *         description: Sto nije pronađen
+ */
 // DELETE /api/tables/:id
 export async function DELETE(
   _req: Request,

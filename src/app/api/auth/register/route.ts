@@ -3,6 +3,46 @@ import { signToken } from "@/lib/auth";
 import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 
+
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Registracija korisnika
+ *     tags:
+ *       - Auth
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ime
+ *               - email
+ *               - lozinka
+ *             properties:
+ *               ime:
+ *                 type: string
+ *                 example: Milica
+ *               email:
+ *                 type: string
+ *                 example: milica@test.com
+ *               lozinka:
+ *                 type: string
+ *                 example: 123456
+ *               uloga:
+ *                 type: string
+ *                 enum: [GUEST, MANAGER]
+ *                 example: GUEST
+ *     responses:
+ *       201:
+ *         description: Korisnik uspešno registrovan
+ *       400:
+ *         description: Nedostaju podaci ili nevalidna uloga
+ *       409:
+ *         description: Email već postoji
+ */
 export async function POST(req: Request) {
   try {
     const body = await req.json();

@@ -7,6 +7,25 @@ function parseId(idParam: string) {
   return Number.isFinite(id) ? id : null;
 }
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Vraća jednog korisnika po ID-u
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Jedan korisnik
+ *       404:
+ *         description: Korisnik nije pronađen
+ */
 // GET /api/users/:id
 export async function GET(
   _req: Request,
@@ -40,6 +59,39 @@ export async function GET(
   return NextResponse.json(user);
 }
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     summary: Menja korisnika
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ime:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               uloga:
+ *                 type: string
+ *                 enum: [GUEST, MANAGER, ADMIN]
+ *     responses:
+ *       200:
+ *         description: Korisnik uspešno izmenjen
+ *       409:
+ *         description: Email već postoji
+ */
 // PUT /api/users/:id
 export async function PUT(
   req: Request,
@@ -102,6 +154,25 @@ export async function PUT(
   }
 }
 
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *     summary: Briše korisnika
+ *     tags:
+ *       - Users
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Korisnik uspešno obrisan
+ *       404:
+ *         description: Korisnik nije pronađen
+ */
 // DELETE /api/users/:id
 export async function DELETE(
   _req: Request,

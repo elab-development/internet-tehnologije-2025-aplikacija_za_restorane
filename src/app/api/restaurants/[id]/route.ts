@@ -7,6 +7,27 @@ function toId(idParam: string) {
   return Number.isFinite(id) ? id : null;
 }
 
+/**
+ * @swagger
+ * /api/restaurants/{id}:
+ *   get:
+ *     summary: Vraća jedan restoran po ID-u
+ *     tags:
+ *       - Restaurants
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Jedan restoran
+ *       400:
+ *         description: Nevalidan id
+ *       404:
+ *         description: Restoran nije pronađen
+ */
 // GET /api/restaurants/:id
 export async function GET(
   _req: Request,
@@ -45,6 +66,42 @@ export async function GET(
   return NextResponse.json(restaurant);
 }
 
+/**
+ * @swagger
+ * /api/restaurants/{id}:
+ *   put:
+ *     summary: Menja restoran
+ *     tags:
+ *       - Restaurants
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               naziv:
+ *                 type: string
+ *               adresa:
+ *                 type: string
+ *               opis:
+ *                 type: string
+ *               radnoVreme:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Restoran uspešno izmenjen
+ *       403:
+ *         description: Nema dozvolu
+ *       404:
+ *         description: Restoran nije pronađen
+ */
 // PUT /api/restaurants/:id
 export async function PUT(
   req: Request,
@@ -98,6 +155,29 @@ export async function PUT(
   }
 }
 
+/**
+ * @swagger
+ * /api/restaurants/{id}:
+ *   delete:
+ *     summary: Briše restoran
+ *     tags:
+ *       - Restaurants
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Restoran uspešno obrisan
+ *       400:
+ *         description: Restoran ima povezane podatke ili nevalidan id
+ *       403:
+ *         description: Nema dozvolu
+ *       404:
+ *         description: Restoran nije pronađen
+ */
 // DELETE /api/restaurants/:id
 export async function DELETE(
   _req: Request,

@@ -7,6 +7,31 @@ type CachedResult = {
 
 const geocodeCache = new Map<string, CachedResult>();
 
+/**
+ * @swagger
+ * /api/geocode:
+ *   post:
+ *     summary: Pretvara adresu u geografske koordinate
+ *     tags:
+ *       - Map
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - address
+ *             properties:
+ *               address:
+ *                 type: string
+ *                 example: Knez Mihailova 10 Beograd
+ *     responses:
+ *       200:
+ *         description: Koordinate adrese
+ *       400:
+ *         description: Adresa nije validna
+ */
 export async function GET(req: NextRequest) {
   const address = req.nextUrl.searchParams.get("address");
 

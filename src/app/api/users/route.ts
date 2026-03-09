@@ -3,6 +3,20 @@ import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
 import bcrypt from "bcryptjs";
 
+
+/**
+ * @swagger
+ * /api/users:
+ *   get:
+ *     summary: Vraća sve korisnike
+ *     tags:
+ *       - Users
+ *     responses:
+ *       200:
+ *         description: Lista korisnika
+ *       403:
+ *         description: Samo admin
+ */
 // GET /api/users
 // Poenta: vraća sve korisnike (bez lozinke)
 export async function GET() {
@@ -23,6 +37,40 @@ export async function GET() {
   return NextResponse.json(users);
 }
 
+/**
+ * @swagger
+ * /api/users:
+ *   post:
+ *     summary: Kreira novog korisnika
+ *     tags:
+ *       - Users
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - ime
+ *               - email
+ *               - lozinka
+ *               - uloga
+ *             properties:
+ *               ime:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               lozinka:
+ *                 type: string
+ *               uloga:
+ *                 type: string
+ *                 enum: [GUEST, MANAGER, ADMIN]
+ *     responses:
+ *       201:
+ *         description: Korisnik uspešno kreiran
+ *       409:
+ *         description: Email već postoji
+ */
 // POST /api/users
 // Poenta: admin kreira novog korisnika u bazi
 export async function POST(req: Request) {

@@ -2,6 +2,17 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { getAuth } from "@/lib/auth";
 
+/**
+ * @swagger
+ * /api/map-restaurants:
+ *   get:
+ *     summary: Vraća restorane za prikaz na mapi
+ *     tags:
+ *       - Map
+ *     responses:
+ *       200:
+ *         description: Lista restorana sa koordinatama
+ */
 // GET /api/map-restaurants
 // - manager vidi samo svoje restorane
 // - guest / neprijavljen / admin vidi sve

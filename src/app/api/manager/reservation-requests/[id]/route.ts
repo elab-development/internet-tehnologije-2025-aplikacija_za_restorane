@@ -7,6 +7,37 @@ function parseId(idParam: string) {
   return Number.isFinite(id) ? id : null;
 }
 
+/**
+ * @swagger
+ * /api/manager/reservation-requests/{id}:
+ *   put:
+ *     summary: Menadžer potvrđuje ili odbija rezervaciju
+ *     tags:
+ *       - Manager
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [CONFIRMED, CANCELLED]
+ *     responses:
+ *       200:
+ *         description: Status rezervacije promenjen
+ *       403:
+ *         description: Nema dozvolu
+ *       404:
+ *         description: Rezervacija nije pronađena
+ */
 // PATCH /api/manager/reservation-requests/:id
 export async function PATCH(
   req: Request,

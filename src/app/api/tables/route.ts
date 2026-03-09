@@ -2,6 +2,17 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
 
+/**
+ * @swagger
+ * /api/tables:
+ *   get:
+ *     summary: Vraća sve stolove
+ *     tags:
+ *       - Tables
+ *     responses:
+ *       200:
+ *         description: Lista stolova
+ */
 // GET /api/tables
 // Poenta: vraća sve stolove sa informacijom kom restoranu pripadaju
 export async function GET() {
@@ -20,6 +31,39 @@ export async function GET() {
   return NextResponse.json(tables);
 }
 
+/**
+ * @swagger
+ * /api/tables:
+ *   post:
+ *     summary: Kreira novi sto
+ *     tags:
+ *       - Tables
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - restoranId
+ *               - brojStola
+ *               - kapacitet
+ *             properties:
+ *               restoranId:
+ *                 type: integer
+ *                 example: 1
+ *               brojStola:
+ *                 type: integer
+ *                 example: 5
+ *               kapacitet:
+ *                 type: integer
+ *                 example: 4
+ *     responses:
+ *       201:
+ *         description: Sto uspešno dodat
+ *       409:
+ *         description: Sto već postoji
+ */
 // POST /api/tables
 // Poenta: dodaje novi sto u restoran
 export async function POST(req: Request) {

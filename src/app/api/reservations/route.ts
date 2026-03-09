@@ -42,6 +42,18 @@ function isWithinWorkingHours(dateTime: Date, radnoVreme: string) {
   );
 }
 
+
+/**
+ * @swagger
+ * /api/reservations:
+ *   get:
+ *     summary: Vraća sve rezervacije
+ *     tags:
+ *       - Reservations
+ *     responses:
+ *       200:
+ *         description: Lista rezervacija
+ */
 // GET /api/reservations
 // Poenta: vraća rezervacije + povezane podatke (user, sto, restoran)
 export async function GET() {
@@ -66,6 +78,31 @@ export async function GET() {
   return NextResponse.json(reservations);
 }
 
+/**
+ * @swagger
+ * /api/reservations:
+ *   post:
+ *     summary: Kreira novu rezervaciju
+ *     tags:
+ *       - Reservations
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tableId:
+ *                 type: integer
+ *               dateTime:
+ *                 type: string
+ *                 format: date-time
+ *               brojOsoba:
+ *                 type: integer
+ *     responses:
+ *       201:
+ *         description: Rezervacija uspešno kreirana
+ */
 // POST /api/reservations
 // Poenta: kreira novu rezervaciju uz osnovne provere
 export async function POST(req: Request) {
