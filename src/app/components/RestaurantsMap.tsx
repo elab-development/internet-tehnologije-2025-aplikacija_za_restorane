@@ -89,7 +89,7 @@ export default function RestaurantsMap() {
   return (
     <section className="mt-12">
       <h2 className="text-2xl font-semibold text-zinc-900 mb-4">
-        Mapa restorana
+        Lokacije restorana
       </h2>
 
       {loading && <p>Učitavanje mape...</p>}

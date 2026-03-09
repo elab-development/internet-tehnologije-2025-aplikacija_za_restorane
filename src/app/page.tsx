@@ -134,7 +134,7 @@ export default function Home() {
     <main className="min-h-screen bg-zinc-50 px-6 py-4">
       <div className="max-w-6xl mx-auto">
         <h1 className="text-3xl font-bold text-zinc-900">
-          {user?.uloga === "MANAGER" ? "Moji restorani" : "Restorani u ponudi"}
+          {user?.uloga === "MANAGER" ? "Moji restorani" : "Istražite restorane"}
         </h1>
 
         <div className="flex flex-col md:flex-row gap-4 mt-5 mb-5">
@@ -173,13 +173,13 @@ export default function Home() {
 
         <p style={{ color: "#555", marginBottom: 18 }}>
           {user?.uloga === "MANAGER"
-            ? "Pregled restorana kojima upravljate."
-            : "Izaberi restoran i klikni „Detalji” za više informacija."}
+            ? "Pregledajte restorane kojima upravljate i upravljajte njihovim podacima."
+            : "Pregledajte dostupne restorane i rezervišite sto u željenom terminu."}
         </p>
 
         {!loading && !greska && (
           <p className="text-zinc-600 mb-4">
-            Broj pronađenih restorana: {filteredRestaurants.length}
+            Pronađeno restorana: {filteredRestaurants.length}
           </p>
         )}
 
@@ -199,8 +199,8 @@ export default function Home() {
               {search
                 ? "Rezultati pretrage"
                 : user?.uloga === "MANAGER"
-                ? "Vaši restorani"
-                : "Svi restorani"}
+                  ? "Restorani koje vodite"
+                  : "Svi restorani"}
             </h2>
 
             <div
