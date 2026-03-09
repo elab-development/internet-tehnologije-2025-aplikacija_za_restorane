@@ -28,6 +28,7 @@ export default function Input({
         borderRadius: 10,
         backgroundColor: "#ffffff",
         color: "#18181b",
+        fontSize: 16,
         outline: "none",
       }}
     />
