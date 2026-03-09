@@ -150,32 +150,34 @@ export default function NewTablePage() {
             </div>
 
             <div>
-              <label className="block text-zinc-800 mb-2 font-medium">
-                Broj stola
-              </label>
-              <input
-                type="number"
-                min="1"
-                placeholder="Unesite broj stola"
-                value={brojStola}
-                onKeyDown={(e) => e.key === "-" && e.preventDefault()}
-                onChange={(e) => setBrojStola(e.target.value)}
-              />
-            </div>
+  <label className="block text-zinc-800 mb-2 font-medium">
+    Broj stola
+  </label>
+
+  <input
+    type="number"
+    min="1"
+    placeholder="Unesite broj stola"
+    value={brojStola}
+    onChange={(e) => setBrojStola(e.target.value)}
+    className="w-full rounded-2xl border border-zinc-300 bg-white px-4 py-4 text-black outline-none"
+  />
+</div>
 
             <div>
-              <label className="block text-zinc-800 mb-2 font-medium">
-                Kapacitet
-              </label>
-              <input
-                type="number"
-                min="1"
-                placeholder="Unesite kapacitet"
-                value={kapacitet}
-                onKeyDown={(e) => e.key === "-" && e.preventDefault()}
-                onChange={(e) => setKapacitet(e.target.value)}
-              />
-            </div>
+  <label className="block text-zinc-800 mb-2 font-medium">
+    Kapacitet
+  </label>
+
+  <input
+    type="number"
+    min="1"
+    placeholder="Unesite kapacitet"
+    value={kapacitet}
+    onChange={(e) => setKapacitet(e.target.value)}
+    className="w-full rounded-2xl border border-zinc-300 bg-white px-4 py-4 text-black outline-none"
+  />
+</div>
 
             {greska && <p className="text-red-500">{greska}</p>}
             {uspeh && <p className="text-green-600">{uspeh}</p>}
