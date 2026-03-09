@@ -96,7 +96,7 @@ export async function PUT(
     }
     if (e?.code === "P2002") {
       return NextResponse.json(
-        { error: "Sto sa tim brojem već postoji u tom restoranu" },
+        { error: "Sto sa tim brojem već postoji u tom restoranu."},
         { status: 409 }
       );
     }
@@ -128,7 +128,7 @@ export async function DELETE(
     }
     if (e?.code === "P2003") {
       return NextResponse.json(
-        { error: "Sto ne može da se obriše jer ima povezane rezervacije" }, { status: 404 });
+        { error: "Sto ne može da se obriše jer ima povezane rezervacije." }, { status: 404 });
     }
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }

@@ -122,7 +122,8 @@ export default function NewTablePage() {
     return tables.find(
       (table) =>
         String(table.restoranId) === restoranId &&
-        table.brojStola === Number(brojStola)
+        table.brojStola === Number(brojStola) &&
+        table.kapacitet === Number(kapacitet)
     );
   }
 
@@ -351,7 +352,7 @@ export default function NewTablePage() {
                 <div className="space-y-1 text-sm text-zinc-700">
                   {selectedRestaurantTables.map((table) => (
                     <p key={table.id}>
-                      Sto #{table.brojStola} — kapacitet {table.kapacitet}
+                      Sto {table.brojStola} - kapacitet {table.kapacitet}
                     </p>
                   ))}
                 </div>

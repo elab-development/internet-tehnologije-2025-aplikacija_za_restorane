@@ -75,7 +75,7 @@ export async function POST(req: Request) {
   } catch (e: any) {
     if (e?.code === "P2002") {
       return NextResponse.json(
-        { error: "Sto sa tim brojem već postoji u tom restoranu" },
+        { error: "Sto sa tim brojem već postoji u tom restoranu."},
         { status: 409 }
       );
     }

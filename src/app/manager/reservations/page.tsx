@@ -87,21 +87,21 @@ export default function ManagerReservationsPage() {
   }
 
   function formatDate(dateString: string) {
-  const date = new Date(dateString);
+    const date = new Date(dateString);
 
-  const datum = date.toLocaleDateString("sr-RS", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-  });
+    const datum = date.toLocaleDateString("sr-RS", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
 
-  const vreme = date.toLocaleTimeString("sr-RS", {
-    hour: "2-digit",
-    minute: "2-digit",
-  });
+    const vreme = date.toLocaleTimeString("sr-RS", {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
-  return `${datum} u ${vreme}`;
-}
+    return `${datum} u ${vreme}`;
+  }
 
   return (
     <main className="min-h-screen bg-zinc-50 px-6 py-6">
@@ -145,7 +145,7 @@ export default function ManagerReservationsPage() {
                   </p>
 
                   <p>
-                    🪑 <b>Sto:</b> {request.table.brojStola}
+                    🍽️ <b>Sto:</b> {request.table.brojStola}
                   </p>
 
                   <p>
@@ -172,12 +172,12 @@ export default function ManagerReservationsPage() {
                     Odobri
                   </Button>
 
-                  <Button
-                    variant="success"
+                  <button
                     onClick={() => handleUpdateStatus(request.id, "CANCELLED")}
+                    className="bg-red-500 hover:bg-red-600 text-white font-semibold px-4 py-2 rounded transition"
                   >
                     Odbij
-                  </Button>
+                  </button>
                 </div>
               </div>
             ))}

@@ -155,11 +155,11 @@ export default function MyReservationsPage() {
         prev.map((reservation) =>
           reservation.id === selectedReservation.id
             ? {
-                ...reservation,
-                dateTime: data.dateTime,
-                brojOsoba: data.brojOsoba,
-                status: data.status,
-              }
+              ...reservation,
+              dateTime: data.dateTime,
+              brojOsoba: data.brojOsoba,
+              status: data.status,
+            }
             : reservation
         )
       );
@@ -225,7 +225,6 @@ export default function MyReservationsPage() {
         </p>
 
         {loading && <p className="text-zinc-600">Učitavanje rezervacija...</p>}
-
         {greska && <p className="text-red-600">{greska}</p>}
 
         {!loading && !greska && reservations.length === 0 && (
@@ -286,7 +285,7 @@ export default function MyReservationsPage() {
 
                       <button
                         onClick={() => handleCancelReservation(reservation.id)}
-                        className="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition"
+                        className="bg-red-500 hover:bg-red-600 text-white font-semibold px-6 py-3 rounded-xl transition"
                       >
                         Otkaži rezervaciju
                       </button>
@@ -301,7 +300,7 @@ export default function MyReservationsPage() {
 
       <Modal
         isOpen={openEdit}
-        title="Izmena rezervacije"
+        title=""
         onClose={() => {
           setOpenEdit(false);
           setSelectedReservation(null);
@@ -311,19 +310,23 @@ export default function MyReservationsPage() {
       >
         {selectedReservation && (
           <>
-            <div style={{ lineHeight: 1.8 }}>
+            <div className="space-y-2 text-zinc-800">
               <div>
                 <b>Restoran:</b> {selectedReservation.table.restaurant.naziv}
               </div>
+
               <div>
                 <b>Adresa:</b> {selectedReservation.table.restaurant.adresa}
               </div>
+
               <div>
-                <b>Sto:</b> #{selectedReservation.table.brojStola}
+                <b>Sto:</b> {selectedReservation.table.brojStola}
               </div>
+
               <div>
                 <b>Kapacitet stola:</b> {selectedReservation.table.kapacitet}
               </div>
+
               {selectedReservation.table.restaurant.radnoVreme && (
                 <div>
                   <b>Radno vreme:</b>{" "}
@@ -344,14 +347,15 @@ export default function MyReservationsPage() {
                 id="editDateTime"
                 type="datetime-local"
                 value={editDateTime}
+                min={new Date().toISOString().slice(0, 16)}
                 onChange={(e) => setEditDateTime(e.target.value)}
                 style={{
                   width: "100%",
-                  padding: "10px",
-                  borderRadius: "8px",
-                  border: "1px solid #ccc",
-                  color: "black",
-                  backgroundColor: "white",
+                  padding: "12px",
+                  borderRadius: "12px",
+                  border: "1px solid #d4d4d8",
+                  color: "#18181b",
+                  backgroundColor: "#ffffff",
                 }}
               />
             </div>
@@ -361,7 +365,13 @@ export default function MyReservationsPage() {
                 type="number"
                 placeholder="Broj osoba"
                 value={editBrojOsoba}
-                onChange={(e) => setEditBrojOsoba(e.target.value)}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+
+                  if (value >= 1 && value <= selectedReservation!.table.kapacitet) {
+                    setEditBrojOsoba(e.target.value);
+                  }
+                }}
               />
             </div>
 
