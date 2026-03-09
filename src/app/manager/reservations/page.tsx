@@ -87,16 +87,21 @@ export default function ManagerReservationsPage() {
   }
 
   function formatDate(dateString: string) {
-    const date = new Date(dateString);
+  const date = new Date(dateString);
 
-    return date.toLocaleString("sr-RS", {
-      day: "2-digit",
-      month: "2-digit",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  }
+  const datum = date.toLocaleDateString("sr-RS", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+  });
+
+  const vreme = date.toLocaleTimeString("sr-RS", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  return `${datum} u ${vreme}`;
+}
 
   return (
     <main className="min-h-screen bg-zinc-50 px-6 py-6">
@@ -140,7 +145,7 @@ export default function ManagerReservationsPage() {
                   </p>
 
                   <p>
-                    🪑 <b>Sto:</b> #{request.table.brojStola}
+                    🪑 <b>Sto:</b> {request.table.brojStola}
                   </p>
 
                   <p>
