@@ -44,7 +44,6 @@ export async function GET(
     where: { id },
     include: {
       tables: true,
-      menuItems: true,
       administrator: {
         select: {
           id: true,
