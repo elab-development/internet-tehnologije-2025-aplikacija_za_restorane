@@ -2,178 +2,82 @@ import { prisma } from "@/lib/db";
 import { NextResponse } from "next/server";
 import { requireRole } from "@/lib/guards";
 
-function parseId(idParam: string) {
-  const id = Number(idParam);
-  return Number.isFinite(id) ? id : null;
-}
-
-/**
- * @swagger
- * /api/users/{id}:
- *   get:
- *     summary: Vraća jednog korisnika po ID-u
- *     tags:
- *       - Users
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     responses:
- *       200:
- *         description: Jedan korisnik
- *       404:
- *         description: Korisnik nije pronađen
- */
-// GET /api/users/:id
-export async function GET(
-  _req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const guard = await requireRole(["ADMIN"]);
-  if (!guard.ok) return guard.response;
-
-  const { id: rawId } = await params;
-  const id = parseId(rawId);
-
-  if (!id) {
-    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
-  }
-
-  const user = await prisma.user.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      ime: true,
-      email: true,
-      uloga: true,
-      datumKreiranja: true,
-    },
-  });
-
-  if (!user) {
-    return NextResponse.json({ error: "User nije pronađen" }, { status: 404 });
-  }
-
-  return NextResponse.json(user);
-}
-
-/**
- * @swagger
- * /api/users/{id}:
- *   put:
- *     summary: Menja korisnika
- *     tags:
- *       - Users
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               ime:
- *                 type: string
- *               email:
- *                 type: string
- *               uloga:
- *                 type: string
- *                 enum: [GUEST, MANAGER, ADMIN]
- *     responses:
- *       200:
- *         description: Korisnik uspešno izmenjen
- *       409:
- *         description: Email već postoji
- */
-// PUT /api/users/:id
-export async function PUT(
-  req: Request,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  const guard = await requireRole(["ADMIN"]);
-  if (!guard.ok) return guard.response;
-
-  const { id: rawId } = await params;
-  const id = parseId(rawId);
-
-  if (!id) {
-    return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
-  }
-
-  const body = await req.json();
-
-  const data: { ime?: string; email?: string; uloga?: "GUEST" | "MANAGER" | "ADMIN" } = {};
-
-  if (body.ime !== undefined) data.ime = body.ime;
-  if (body.email !== undefined) data.email = body.email;
-
-  if (body.uloga !== undefined) {
-    const allowedRoles = ["GUEST", "MANAGER", "ADMIN"];
-    if (!allowedRoles.includes(body.uloga)) {
-      return NextResponse.json(
-        { error: "Uloga mora biti: GUEST, MANAGER ili ADMIN" },
-        { status: 400 }
-      );
-    }
-    data.uloga = body.uloga;
-  }
-
-  if (Object.keys(data).length === 0) {
-    return NextResponse.json({ error: "Nema podataka za izmenu" }, { status: 400 });
-  }
-
-  try {
-    const updated = await prisma.user.update({
-      where: { id },
-      data,
-      select: {
-        id: true,
-        ime: true,
-        email: true,
-        uloga: true,
-        datumKreiranja: true,
-      },
-    });
-
-    return NextResponse.json(updated);
-  } catch (e: any) {
-    if (e?.code === "P2025") {
-      return NextResponse.json({ error: "User nije pronađen" }, { status: 404 });
-    }
-    if (e?.code === "P2002") {
-      return NextResponse.json({ error: "Email već postoji" }, { status: 409 });
-    }
-    return NextResponse.json({ error: "Server error" }, { status: 500 });
-  }
-}
-
 /**
  * @swagger
  * /api/users/{id}:
  *   delete:
- *     summary: Briše korisnika
+ *     summary: Brisanje korisnika
+ *     description: Administrator može obrisati korisnika po ID-u. Admin ne može obrisati sebe niti drugog admina.
  *     tags:
  *       - Users
+ *     security:
+ *       - bearerAuth: []
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
+ *         description: ID korisnika koji se briše
  *         schema:
  *           type: integer
+ *           example: 4
  *     responses:
  *       200:
  *         description: Korisnik uspešno obrisan
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 ok:
+ *                   type: boolean
+ *                   example: true
+ *       400:
+ *         description: Nevalidan ID ili admin pokušava da obriše sebe
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   examples:
+ *                     invalidId:
+ *                       value: Nevalidan id
+ *                     deleteSelf:
+ *                       value: Admin ne može da obriše sopstveni nalog.
+ *                     relatedData:
+ *                       value: Korisnik ne može da se obriše jer ima povezane podatke.
+ *       403:
+ *         description: Nije dozvoljeno brisanje drugog admina
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Admin ne može da obriše drugog admina.
  *       404:
  *         description: Korisnik nije pronađen
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Korisnik nije pronađen
+ *       500:
+ *         description: Greška na serveru
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   example: Server error
  */
-// DELETE /api/users/:id
 export async function DELETE(
   _req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -182,19 +86,57 @@ export async function DELETE(
   if (!guard.ok) return guard.response;
 
   const { id: rawId } = await params;
-  const id = parseId(rawId);
+  const id = Number(rawId);
 
-  if (!id) {
+  if (!Number.isFinite(id)) {
     return NextResponse.json({ error: "Nevalidan id" }, { status: 400 });
   }
 
+  if (guard.auth.userId === id) {
+    return NextResponse.json(
+      { error: "Admin ne može da obriše sopstveni nalog." },
+      { status: 400 }
+    );
+  }
+
+  const existingUser = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      uloga: true,
+    },
+  });
+
+  if (!existingUser) {
+    return NextResponse.json(
+      { error: "Korisnik nije pronađen" },
+      { status: 404 }
+    );
+  }
+
+  if (existingUser.uloga === "ADMIN") {
+    return NextResponse.json(
+      { error: "Admin ne može da obriše drugog admina." },
+      { status: 403 }
+    );
+  }
+
   try {
-    await prisma.user.delete({ where: { id } });
+    await prisma.user.delete({
+      where: { id },
+    });
+
     return NextResponse.json({ ok: true });
   } catch (e: any) {
-    if (e?.code === "P2025") {
-      return NextResponse.json({ error: "User nije pronađen" }, { status: 404 });
+    console.error("DELETE user error:", e);
+
+    if (e?.code === "P2003") {
+      return NextResponse.json(
+        { error: "Korisnik ne može da se obriše jer ima povezane podatke." },
+        { status: 400 }
+      );
     }
+
     return NextResponse.json({ error: "Server error" }, { status: 500 });
   }
 }

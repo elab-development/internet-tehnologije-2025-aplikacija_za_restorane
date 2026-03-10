@@ -285,7 +285,7 @@ export default function Home() {
                     Obriši restoran
                   </Button>
                 </>
-              ) : (
+              ) : user?.uloga === "GUEST" || !user ? (
                 <Button
                   variant="success"
                   onClick={() => {
@@ -294,7 +294,7 @@ export default function Home() {
                 >
                   Rezerviši sto
                 </Button>
-              )}
+              ) : null}
             </div>
 
               {deleteError && (

@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 type AuthUser = {
   id: number;
@@ -11,11 +11,11 @@ type AuthUser = {
 
 export default function Navbar() {
   const pathname = usePathname();
-  const router = useRouter();
 
   const [user, setUser] = useState<AuthUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [openManage, setOpenManage] = useState(false);
+  const [openAdmin, setOpenAdmin] = useState(false);
 
   useEffect(() => {
     async function loadMe() {
@@ -52,6 +52,7 @@ export default function Navbar() {
 
     setUser(null);
     setOpenManage(false);
+    setOpenAdmin(false);
     window.location.href = "/";
   }
 
@@ -107,7 +108,10 @@ export default function Navbar() {
               {user.uloga === "MANAGER" && (
                 <div className="relative">
                   <button
-                    onClick={() => setOpenManage(!openManage)}
+                    onClick={() => {
+                      setOpenManage(!openManage);
+                      setOpenAdmin(false);
+                    }}
                     className="font-medium text-gray-700 hover:text-green-600"
                   >
                     Upravljanje restoranima ▾
@@ -132,18 +136,51 @@ export default function Navbar() {
                       <Link
                         href="/manager/reservations"
                         className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
-                        >
+                      >
                         Zahtevi za rezervaciju
-                        </Link>
+                      </Link>
                     </div>
                   )}
                 </div>
               )}
 
               {user.uloga === "ADMIN" && (
-                <span className="font-medium text-gray-700">
-                  Admin nalog
-                </span>
+                <div className="relative">
+                  <button
+                    onClick={() => {
+                      setOpenAdmin(!openAdmin);
+                      setOpenManage(false);
+                    }}
+                    className="font-medium text-gray-700 hover:text-green-600"
+                  >
+                    Administracija sistema ▾
+                  </button>
+
+                  {openAdmin && (
+                    <div className="absolute right-0 mt-2 bg-white border rounded shadow-md w-56 z-50">
+                      <Link
+                        href="/admin/users"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        Pregled svih korisnika
+                      </Link>
+
+                      <Link
+                        href="/admin/reservations"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        Pregled svih rezervacija
+                      </Link>
+
+                      <Link
+                        href="/admin/dashboard"
+                        className="block px-4 py-2 text-gray-700 hover:bg-gray-100"
+                      >
+                        Statistika sistema
+                      </Link>
+                    </div>
+                  )}
+                </div>
               )}
 
               <button

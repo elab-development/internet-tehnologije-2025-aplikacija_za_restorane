@@ -10,10 +10,8 @@ async function main() {
   const managerPass = await bcrypt.hash("123456", 10);
   const guestPass = await bcrypt.hash("123456", 10);
 
-  await prisma.orderItem.deleteMany();
-  await prisma.order.deleteMany();
+
   await prisma.reservation.deleteMany();
-  await prisma.menuItem.deleteMany();
   await prisma.table.deleteMany();
   await prisma.restaurant.deleteMany();
   await prisma.user.deleteMany();
