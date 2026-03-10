@@ -97,7 +97,6 @@ export async function GET(
           },
         },
       },
-      order: true,
     },
   });
 
