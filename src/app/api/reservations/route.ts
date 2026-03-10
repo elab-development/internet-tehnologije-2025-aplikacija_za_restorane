@@ -70,7 +70,6 @@ export async function GET() {
           restaurant: { select: { id: true, naziv: true, adresa: true } },
         },
       },
-      order: true,
     },
     orderBy: { dateTime: "desc" },
   });
