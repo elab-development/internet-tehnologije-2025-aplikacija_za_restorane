@@ -14,7 +14,7 @@ async function main() {
   await prisma.reservation.deleteMany();
   await prisma.table.deleteMany();
   await prisma.restaurant.deleteMany();
-  await prisma.user.deleteMany();
+  //await prisma.user.deleteMany();
 
   const admin = await prisma.user.create({
     data: {
